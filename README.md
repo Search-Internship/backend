@@ -10,7 +10,7 @@ $ pip install -r requirements/base.txt
 ### Test :
 ```bash
 # install requirements
-$ pip install -r requirements/base.txt 
+$ pip install -r requirements/test.txt 
 ```
 ### Production :
 ```bash
@@ -20,7 +20,7 @@ $ pip install -r requirements/prod.txt
 ## Running the app : 
 ```bash
 # Run application
-$ uvicorn main:app --workers 1 --host 127.0.0.1 --port 3000 --reload --log-level info
+$ uvicorn src/main:app --workers 1 --host 127.0.0.1 --port 8000 --reload --log-level info
 ```
 ## Build Docker image : 
 ```bash
@@ -30,7 +30,7 @@ $ docker build -t ema-back .
 ## Running the app in the Docker : 
 ```bash
 # Run docker image
-$ docker run -p 5000:5000 ema-back
+$ docker run -p you_port:5000 ema-back
 ```
 
 ## Endpoints
