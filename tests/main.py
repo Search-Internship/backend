@@ -1,0 +1,93 @@
+import os
+import sys
+parent_dir = os.path.abspath(os.path.join(os.getcwd(), '.'))
+sys.path.append(parent_dir)
+
+import unittest
+from fastapi.testclient import TestClient
+from src.main import app  # Assuming your FastAPI app is defined in main.py
+
+class TestEmailEndpoint(unittest.TestCase):
+    def setUp(self):
+        self.client = TestClient(app)
+
+    def test_missing_files(self):
+        response = self.client.post("/send/")
+        self.assertEqual(response.status_code, 422)  # Expecting Unprocessable Entity status code for missing files
+
+    def test_invalid_file_extensions(self):
+        # Sending invalid file extensions
+        files = {
+            'emails': ('invalid_file.txt', b'file content'),
+            'messages': ('invalid_file.txt', b'file content'),
+            'resume': ('invalid_file.txt', b'file content'),
+        }
+        response = self.client.post("/send/", files=files)
+        self.assertEqual(response.status_code, 422)  # Expecting Unprocessable Entity status code for invalid file extensions
+        
+    def test_invalid_email(self):
+        # Sending valid files and form data
+        files = {
+            'emails': ('test_emails.txt', b'file content'),
+            'messages': ('test_messages.html', b'file content'),
+            'resume': ('test_resume.pdf', b'file content'),
+        }
+        form_data = {
+            'sender_email': 'exampleexample.com',
+            'sender_password': 'xxxx xxxx xxxx xxxx',
+            'email_subject': 'Test Subject',
+        }
+        response = self.client.post("/send/", files=files, data=form_data)
+        self.assertEqual(response.status_code, 422)  # Expecting OK status code for a valid request
+
+    def test_invalid_password(self):
+        # Sending valid files and form data
+        files = {
+            'emails': ('test_emails.txt', b'file content'),
+            'messages': ('test_messages.html', b'file content'),
+            'resume': ('test_resume.pdf', b'file content'),
+        }
+        form_data = {
+            'sender_email': 'example@example.com',
+            'sender_password': 'xxxx xxxx xxxx',
+            'email_subject': 'Test Subject',
+        }
+        response = self.client.post("/send/", files=files, data=form_data)
+        self.assertEqual(response.status_code, 422)  # Expecting OK status code for a valid request
+
+    def test_valid_request(self):
+        # Sending valid files and form data
+        files = {
+            'emails': ('test_emails.txt', b'file content'),
+            'messages': ('test_messages.html', b'file content'),
+            'resume': ('test_resume.pdf', b'file content'),
+        }
+        form_data = {
+            'sender_email': 'example@example.com',
+            'sender_password': 'xxxx xxxx xxxx xxxx',
+            'email_subject': 'Test Subject',
+        }
+        response = self.client.post("/send/", files=files, data=form_data)
+        self.assertEqual(response.status_code, 200)  # Expecting OK status code for a valid request
+
+    def test_email_connection(self):
+        # Sending valid files and form data
+        files = {
+            'emails': ('test_emails.txt', b'file content'),
+            'messages': ('test_messages.html', b'file content'),
+            'resume': ('test_resume.pdf', b'file content'),
+        }
+        form_data = {
+            'sender_email': 'example@example.com',
+            'sender_password': 'xxxx xxxx xxxx xxxx',
+            'email_subject': 'Test Subject',
+        }
+        response = self.client.post("/send/", files=files, data=form_data)
+        self.assertEqual(response.status_code, 601)  # Expecting OK status code for a valid request
+
+
+
+
+
+if __name__ == '__main__':
+    unittest.main()
