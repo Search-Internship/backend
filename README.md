@@ -33,6 +33,14 @@ $ docker build -t ema-back .
 $ docker run -p you_port:5000 ema-back
 ```
 
+## Working with Docker Hub : 
+```bash
+# Pull docker image
+$ docker pull ouail02/ema-back:tagname
+# Run docker image
+$ docker run -p you_port:5000 ema-back:tagname
+```
+
 ## Endpoints
 
 ### 1. GET /
