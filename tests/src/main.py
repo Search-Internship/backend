@@ -32,23 +32,30 @@ class TestEmailEndpoint(unittest.TestCase):
         # Sending invalid file extensions
         files = {
             'emails': ('invalid_file.txt', b'file content'),
-            'messages': ('invalid_file.txt', b'file content'),
             'resume': ('invalid_file.txt', b'file content'),
         }
-        response = self.client.post("/send/", files=files)
+        form_data = {
+            'sender_email': 'example@example.com',
+            'sender_password': 'xxxx xxxx xxxx',
+            'email_subject': 'Test Subject',
+            'email_body': 'file content',
+            'file_separator':"\n"
+        }
+        response = self.client.post("/send/", files=files, data=form_data)
         self.assertEqual(response.status_code, 422)  # Expecting Unprocessable Entity status code for invalid file extensions
         
     def test_invalid_email(self):
         # Sending valid files and form data
         files = {
             'emails': ('test_emails.txt', b'file content'),
-            'messages': ('test_messages.html', b'file content'),
             'resume': ('test_resume.pdf', b'file content'),
         }
         form_data = {
             'sender_email': 'exampleexample.com',
             'sender_password': 'xxxx xxxx xxxx xxxx',
             'email_subject': 'Test Subject',
+            'email_body': 'file content',
+            'file_separator':"\n"
         }
         response = self.client.post("/send/", files=files, data=form_data)
         self.assertEqual(response.status_code, 422)  # Expecting OK status code for a valid request
@@ -57,13 +64,14 @@ class TestEmailEndpoint(unittest.TestCase):
         # Sending valid files and form data
         files = {
             'emails': ('test_emails.txt', b'file content'),
-            'messages': ('test_messages.html', b'file content'),
             'resume': ('test_resume.pdf', b'file content'),
         }
         form_data = {
             'sender_email': 'example@example.com',
             'sender_password': 'xxxx xxxx xxxx',
             'email_subject': 'Test Subject',
+            'email_body': 'file content',
+            'file_separator':"\n"
         }
         response = self.client.post("/send/", files=files, data=form_data)
         self.assertEqual(response.status_code, 422)  # Expecting OK status code for a valid request
@@ -72,13 +80,14 @@ class TestEmailEndpoint(unittest.TestCase):
         # Sending valid files and form data
         files = {
             'emails': ('test_emails.txt', b'file content'),
-            'messages': ('test_messages.html', b'file content'),
             'resume': ('test_resume.pdf', b'file content'),
         }
         form_data = {
             'sender_email': 'example@example.com',
             'sender_password': 'xxxx xxxx xxxx xxxx',
             'email_subject': 'Test Subject',
+            'email_body': 'file content',
+            'file_separator':"\n"
         }
         response = self.client.post("/send/", files=files, data=form_data)
         self.assertEqual(response.status_code, 601)  # Expecting OK status code for a valid request
@@ -87,13 +96,14 @@ class TestEmailEndpoint(unittest.TestCase):
         # Sending valid files and form data
         files = {
             'emails': ('test_emails.txt', b'file content'),
-            'messages': ('test_messages.html', b'file content'),
             'resume': ('test_resume.pdf', b'file content'),
         }
         form_data = {
             'sender_email': sender_email,
             'sender_password': sender_password,
             'email_subject': 'Test Subject',
+            'email_body': 'file content',
+            'file_separator':"\n"
         }
         response = self.client.post("/send/", files=files, data=form_data)
         self.assertEqual(response.status_code, 200)  # Expecting OK status code for a valid request
