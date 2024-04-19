@@ -5,7 +5,7 @@ sys.path.append(parent_dir)
 
 
 from fastapi import (
-                    FastAPI, File, UploadFile, Form
+                    FastAPI, File, UploadFile, Form, status
                     )   
 from src.exceptions import (
                             FileExtensionException,FileNotFoundException,
@@ -21,7 +21,7 @@ app = FastAPI()
 
 @app.get("/")
 def index():
-    return {"messgae":"I am working good !"}
+    return {"messgae":"I am working good !"},status.HTTP_200_OK
 
 @app.post("/send/")
 async def send_emails(emails: UploadFile = File(None), messages: UploadFile = File(None),
@@ -59,7 +59,8 @@ async def send_emails(emails: UploadFile = File(None), messages: UploadFile = Fi
     emails_content = await emails.read()
     messages_content = await messages.read()
     resume_content = await resume.read()
-    success_receiver = []
+    success_receiver:list = []
+    failed_receiver:list = []
     
 
    
