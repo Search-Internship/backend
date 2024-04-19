@@ -1,10 +1,11 @@
 import os
 import sys
+import unittest
+from fastapi.testclient import TestClient
+
 parent_dir = os.path.abspath(os.path.join(os.getcwd(), '.'))
 sys.path.append(parent_dir)
 
-import unittest
-from fastapi.testclient import TestClient
 from src.main import app  # Assuming your FastAPI app is defined in main.py
 from dotenv import load_dotenv
 from pathlib import Path
@@ -13,7 +14,7 @@ from pathlib import Path
 load_dotenv(dotenv_path=str(Path("./tests/.env")))
 
 # Access the variables
-sender_email = os.getenv("EMAIL_UNIT_TEST")
+sender_email = os.getenv("EMAIL_SENDER_UNIT_TEST")
 sender_password = os.getenv("PASSWORD_UNIT_TEST")
 class TestEmailEndpoint(unittest.TestCase):
     def setUp(self):
