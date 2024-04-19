@@ -81,6 +81,12 @@ $ docker run -p you_port:5000 ema-back:tagname
         "detail": "The email form is incorrect"
     }
     ```
+  - **601 The server declined the request:** The request parameters were valid, but the email and password not valid.
+    ```json
+    {
+        "detail": "Failed to connect to gmail."
+    }
+    ```
   - **500 Internal Server Error:** The server encountered an unexpected error while processing the request.
     ```json
     {
