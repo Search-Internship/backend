@@ -19,6 +19,10 @@ class TestEmailEndpoint(unittest.TestCase):
     def setUp(self):
         self.client = TestClient(app)
 
+    def test_index(self):
+        response = self.client.get("/")
+        self.assertEqual(response.status_code, 200)
+
     def test_missing_files(self):
         response = self.client.post("/send/")
         self.assertEqual(response.status_code, 422)  # Expecting Unprocessable Entity status code for missing files
@@ -77,7 +81,7 @@ class TestEmailEndpoint(unittest.TestCase):
         }
         response = self.client.post("/send/", files=files, data=form_data)
         self.assertEqual(response.status_code, 601)  # Expecting OK status code for a valid request
-        
+
     def test_valid_request(self):
         # Sending valid files and form data
         files = {

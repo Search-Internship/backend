@@ -19,6 +19,10 @@ from src.email.main import (
 
 app = FastAPI()
 
+@app.get("/")
+def index():
+    return {"messgae":"I am working good !"}
+
 @app.post("/send/")
 async def send_emails(emails: UploadFile = File(None), messages: UploadFile = File(None),
                       resume: UploadFile = File(None), sender_email: str = Form(...), 
