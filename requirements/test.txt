@@ -1,4 +1,1 @@
-fastapi
-pytest
-python-multipart
-requests
+python-dotenv
