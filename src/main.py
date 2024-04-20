@@ -15,8 +15,8 @@ from src.emails.main import (
                             is_password_structure,is_valid_email,send_email_smtp,
                             check_gmail_connection
                             )
-
-
+import shutil
+from pathlib import Path
 app = FastAPI()
 
 @app.get("/")
@@ -52,20 +52,27 @@ async def send_emails(emails: UploadFile = File(None), email_body: str = Form(..
     #Check the validity of email and password to connect to gmail
     if not check_gmail_connection(sender_email,sender_password):
         raise EmailConnectionFailedException("Failed to connect to gmail.")
+    temp_dir = str(Path("./temp"))
+    with open(f"{temp_dir}/emails.txt", "wb") as emails_file:
+        shutil.copyfileobj(emails.file, emails_file)
 
+    with open(f"{temp_dir}/resume.pdf", "wb") as resume_file:
+        shutil.copyfileobj(resume.file, resume_file)
+    
     # Proceed with processing if the files are of the correct types
     success_receiver:list = []
     failed_receiver:list = []
     # Use parse_text_file to parse the emails file with the specified separator
-    emails_list:list = parse_text_file(emails.file, file_separator)
+    emails_list:list = parse_text_file(f"{temp_dir}/emails.txt", file_separator)
 
     # Iterate over the parsed emails list and process each email address
     for email in emails_list:
-        if send_email_smtp(sender_email,sender_password,email,email_subject,email_body,resume.file):
+        if send_email_smtp(sender_email,sender_password,email,email_subject,email_body,f"{temp_dir}/resume.pdf"):
             success_receiver.append(email)
         else:
             failed_receiver.append(email)
 
-   
+    os.remove(f"{temp_dir}/emails.txt")
+    os.remove(f"{temp_dir}/resume.pdf")
     
     return {"success_receiver": success_receiver, "failed_receiver": failed_receiver},status.HTTP_200_OK
