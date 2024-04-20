@@ -53,7 +53,7 @@ class TestEmailFunctions(unittest.TestCase):
         with patch('smtplib.SMTP') as mock_smtp:
             instance = mock_smtp.return_value
             instance.sendmail.return_value = None
-            result = send_email_smtp(sender_email, sender_password, receive_email, "Subject", "Body")
+            result = send_email_smtp(sender_email, sender_password, receive_email, "Subject", "Hello *Body*")
             self.assertEqual(result, expected_result)
 
     def test_message_from_html(self):

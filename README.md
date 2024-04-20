@@ -20,7 +20,7 @@ $ pip install -r requirements/prod.txt
 ## Running the app : 
 ```bash
 # Run application
-$ uvicorn src.main:app --workers 1 --host 127.0.0.1 --port 8000 --reload --log-level info
+$ uvicorn src.main:app --host 127.0.0.1 --port 5000 --reload
 ```
 ## Build Docker image : 
 ```bash
