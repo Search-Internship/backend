@@ -2,4 +2,3 @@ uvicorn
 fastapi[all]
 python-multipart
 PyPDF2
-markdown2

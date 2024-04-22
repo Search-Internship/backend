@@ -43,13 +43,6 @@ def message_from_file(EntrepriseContactName: str, EntrepriseName: str, Entrepris
     return html_message
 
 
-import smtplib
-from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
-from email.mime.base import MIMEBase
-from email import encoders
-import markdown2
-
 def send_email_smtp(sender_email: str, sender_password: str, to: str, email_subject: str, email_body: str,
                     attachment_path: str = None) -> bool:
     """
@@ -60,7 +53,7 @@ def send_email_smtp(sender_email: str, sender_password: str, to: str, email_subj
     - sender_password (str): The sender's email password.
     - to (str): The recipient's email address.
     - email_subject (str): The subject of the email.
-    - email_body (str): The body of the email in Markdown format.
+    - email_body (str): The body of the email in HTML format.
     - attachment_path (str, optional): Path to the attachment file.
 
     Returns:
@@ -73,16 +66,13 @@ def send_email_smtp(sender_email: str, sender_password: str, to: str, email_subj
         smtp_server.starttls()
         smtp_server.login(sender_email, sender_password)
 
-        # Convert Markdown body to HTML
-        email_body_html = markdown2.markdown(email_body)
-
         # Compose the email
         msg = MIMEMultipart()
         msg['From'] = sender_email
         msg['To'] = to
         msg['Subject'] = email_subject
 
-        msg.attach(MIMEText(email_body_html, 'html'))
+        msg.attach(MIMEText(email_body, 'html'))
 
         if attachment_path:
             attachment_name = attachment_path.split("/")[-1]
