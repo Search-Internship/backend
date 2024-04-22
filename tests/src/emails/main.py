@@ -9,7 +9,7 @@ sys.path.append(parent_dir)
 from src.emails.main import *
 
 # Load variables from the specified .env file
-load_dotenv(dotenv_path=str(Path("./tests/.env")))
+load_dotenv(dotenv_path=str(Path("./env/tests.env")))
 
 # Access the variables
 sender_email = os.getenv("EMAIL_SENDER_UNIT_TEST")

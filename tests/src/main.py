@@ -11,7 +11,7 @@ from dotenv import load_dotenv
 from pathlib import Path
 
 # Load variables from the specified .env file
-load_dotenv(dotenv_path=str(Path("./tests/.env")))
+load_dotenv(dotenv_path=str(Path("./env/tests.env")))
 
 # Access the variables
 sender_email = os.getenv("EMAIL_SENDER_UNIT_TEST")
