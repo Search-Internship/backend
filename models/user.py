@@ -68,6 +68,6 @@ class User(Base):
             # Verify password
             if user.check_password(password):
                 # Decrypt and return email password
-                email_password = user.get_email_password(encryption_key)
-                return True, email_password
+                user_id = user.id
+                return True, user_id
         return False, None

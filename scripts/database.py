@@ -50,6 +50,7 @@ try:
     is_connect=True
 except:
     is_connect=False
+    print("Problem on connection to MySQL")
 
 
 if is_connect:

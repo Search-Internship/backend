@@ -20,12 +20,17 @@ from utils.validity import (is_gmail_password_structure,is_valid_email,
 import shutil
 from pathlib import Path
 from models.user import User
+from utils.jwt import create_access_token,decode_access_token
 from dotenv import load_dotenv
 
 # Load variables from the specified .env file
 load_dotenv(dotenv_path=str(Path("./env/secrets.env")))
 
 encryption_key=os.getenv("FERNET_KEY")
+ACCESS_TOKEN_EXPIRE_MINUTES=os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES")
+SECRET_KEY=os.getenv("SECRET_KEY")
+ALGORITHM=os.getenv("ALGORITHM")
+
 
 app = FastAPI()
 
@@ -33,7 +38,7 @@ app = FastAPI()
 api_router = APIRouter(prefix="/api")
 
 @api_router.get("/")
-def index():
+async def index():
     return {"messgae":"I am working good !"}
 
 @api_router.post("/email/send-internship")
@@ -91,7 +96,7 @@ async def send_emails(emails: UploadFile = File(None), email_body: str = Form(..
     return {"success_receiver": success_receiver, "failed_receiver": failed_receiver},status.HTTP_200_OK
 
 @api_router.post("/users/")
-def create_user(
+async def create_user(
     username: str = Form(...),
     email: str = Form(...),
     linkedin_link: str = Form(None),
@@ -131,6 +136,21 @@ def create_user(
     except (EmailException, PasswordException, EmailConnectionFailedException) as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
+
+@api_router.post("/users/login")
+async def login(
+    username_or_email: str = Form(...),
+    password: str = Form(...)
+):
+    # Verify login credentials
+    is_valid_login, user_id = User.verify_login(username_or_email, password, encryption_key)
+    
+    if not is_valid_login:
+        raise HTTPException(status_code=401, detail="Invalid credentials")
+    
+    # Create access token
+    access_token = create_access_token(user_id)
+    return {"access_token": access_token, "token_type": "bearer"}
 
 # Include the API router in the main app
 app.include_router(api_router)

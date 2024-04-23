@@ -44,6 +44,18 @@ $ pip install -r requirements/prod.txt
 #### FERNET_KEY
 - **Description**: The key used for encryption and decryption with Fernet symmetric encryption.
 - **Example**: `FERNET_KEY="Zsy6-8REWdN0-FkIhgBy8k19MJ7elYNAv3MxkWHFGOk="`
+#### ALGORITHM
+- **Description**: The algorithm used for JWT token encoding and decoding.
+- **Example**: `ALGORITHM="HS256"`
+
+#### ACCESS_TOKEN_EXPIRE_MINUTES
+- **Description**: The duration (in minutes) after which JWT access tokens expire.
+- **Example**: `ACCESS_TOKEN_EXPIRE_MINUTES=60`
+
+#### SECRET_KEY
+- **Description**: The secret key used for JWT token encoding and decoding.
+- **Example**: `SECRET_KEY="abababababababbabhha"`
+
 ### 3. `env/tests.env` :
 #### EMAIL_SENDER_UNIT_TEST
 - **Description**: The email address used as the sender for unit tests.
@@ -173,7 +185,46 @@ $ docker run -p you_port:5000 ema-back:tagname
   - `phone_number` (string): Any string.
   - `email_password` (string, optional): A password following a specific format (four segments separated by spaces, each segment exactly four characters long), or an empty string.
 
+### `/api/users/login`
 
+#### `POST /`
+- **Description**: Endpoint to authenticate a user and generate an access token.
+- **Parameters**:
+  - `username_or_email` (required): The username or email of the user.
+  - `password` (required): The password of the user.
+- **Response**:
+  - **Status Code**: 
+    - 200 OK: Successful authentication.
+    - 401 Unauthorized: Invalid credentials.
+  - **Response Body** (for 200 OK):
+    ```json
+    {
+        "access_token": "your-access-token",
+        "token_type": "bearer"
+    }
+    ```### `/api/users/login`
+#### `POST /`
+- **Description**: Endpoint to authenticate a user and generate an access token.
+- **Parameters**:
+  - `username_or_email` (required): The username or email of the user.
+  - `password` (required): The password of the user.
+- **Response**:
+  - **Status Code**: 200 OK
+    - **Response Body**:
+      ```json
+      {
+          "access_token": "your-access-token",
+          "token_type": "bearer"
+      }
+      ```  
+  - **Status Code**: 401 OK
+    - **Response Body**:
+      ```json
+      {
+          "detail":"Invalid credentials"
+      }
+      ```
+  
 
 ## Project Structure :
 This project's directory structure is inspired by the article "[Structuring a FastAPI App: An In-Depth Guide](https://medium.com/@ketansomvanshi007/structuring-a-fastapi-app-an-in-depth-guide-cdec3b8f4710)" on Medium.
@@ -188,6 +239,8 @@ This project's directory structure is inspired by the article "[Structuring a Fa
 - **temp** : Directory for temporary files
 - **templates** : Directory for HTML templates
 - **src** :  Directory for source code of FastAPI application
+- **env** :  Directory for envrenment variables
+
 
 
 ## Stay in touch :
