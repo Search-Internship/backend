@@ -6,4 +6,5 @@ sqlalchemy
 passlib
 cryptography
 mysql-connector-python
-PyJWT
+python-dotenv
+python-jose
