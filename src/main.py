@@ -139,11 +139,11 @@ async def create_user(
 
 @api_router.post("/users/login")
 async def login(
-    username_or_email: str = Form(...),
+    email: str = Form(...),
     password: str = Form(...)
 ):
     # Verify login credentials
-    is_valid_login, user_id = User.verify_login(username_or_email, password, encryption_key)
+    is_valid_login, user_id = User.verify_login(email, password, encryption_key)
     
     if not is_valid_login:
         raise HTTPException(status_code=401, detail="Invalid credentials")

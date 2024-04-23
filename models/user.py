@@ -18,10 +18,10 @@ class User(Base):
     __tablename__ = 'users'
     id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
     username = Column(String)
-    email = Column(String)
+    email = Column(String,unique=True)
     linkedin_link = Column(String)
     password_hash = Column(String)
-    phone_number = Column(String, unique=True)
+    phone_number = Column(String)
     email_password = Column(String)  # Store encrypted email password
 
     def set_password(self, password):
@@ -61,9 +61,9 @@ class User(Base):
         session.commit()
 
     @classmethod
-    def verify_login(cls, username_or_email, password, encryption_key):
-        # Find user by username or email
-        user = session.query(cls).filter((cls.username == username_or_email) | (cls.email == username_or_email)).first()
+    def verify_login(cls, email, password, encryption_key):
+        # Find user email
+        user = session.query(cls).filter(cls.email == email).first()
         if user:
             # Verify password
             if user.check_password(password):

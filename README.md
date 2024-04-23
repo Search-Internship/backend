@@ -190,7 +190,7 @@ $ docker run -p you_port:5000 ema-back:tagname
 #### `POST /`
 - **Description**: Endpoint to authenticate a user and generate an access token.
 - **Parameters**:
-  - `username_or_email` (required): The username or email of the user.
+  - `email` (required): The email of the user.
   - `password` (required): The password of the user.
 - **Response**:
   - **Status Code**: 
@@ -204,28 +204,7 @@ $ docker run -p you_port:5000 ema-back:tagname
     }
     ```
 
-### `/api/users/login`
-#### `POST /`
-- **Description**: Endpoint to authenticate a user and generate an access token.
-- **Parameters**:
-  - `username_or_email` (required): The username or email of the user.
-  - `password` (required): The password of the user.
-- **Response**:
-  - **Status Code**: 200 OK
-    - **Response Body**:
-      ```json
-      {
-          "access_token": "your-access-token",
-          "token_type": "bearer"
-      }
-      ```  
-  - **Status Code**: 401 OK
-    - **Response Body**:
-      ```json
-      {
-          "detail":"Invalid credentials"
-      }
-      ```
+
   
 
 ## Project Structure :
