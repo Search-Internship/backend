@@ -17,10 +17,52 @@ $ pip install -r requirements/test.txt
 # install requirements
 $ pip install -r requirements/prod.txt 
 ```
+
+## Envirenment Variable :
+### 1. `env/database.env` :
+#### USER_NAME
+- **Description**: The username used to authenticate to the MySQL database.
+- **Example**: `USER_NAME="root"`
+
+#### PASSWORD
+- **Description**: The password used to authenticate to the MySQL database.
+- **Example**: `PASSWORD="admin"`
+
+#### PORT
+- **Description**: The port number on which the MySQL database server is listening.
+- **Example**: `PORT="3306"`
+
+#### HOST
+- **Description**: The hostname or IP address of the MySQL database server.
+- **Example**: `HOST="localhost"`
+
+#### DB_NAME
+- **Description**: The name of the MySQL database.
+- **Example**: `DB_NAME="easyinternship"`
+
+### 2. `env/secrets.env` :
+#### FERNET_KEY
+- **Description**: The key used for encryption and decryption with Fernet symmetric encryption.
+- **Example**: `FERNET_KEY="Zsy6-8REWdN0-FkIhgBy8k19MJ7elYNAv3MxkWHFGOk="`
+### 3. `env/tests.env` :
+#### EMAIL_SENDER_UNIT_TEST
+- **Description**: The email address used as the sender for unit tests.
+- **Example**: `EMAIL_SENDER_UNIT_TEST="laamiri.laamiri@etu.uae.ac.ma"`
+
+#### EMAIL_RECEIVER_UNIT_TEST
+- **Description**: The email address used as the receiver for unit tests. You can use one from a temporary email service like [Temp Mail](https://temp-mail.org/fr/).
+- **Example**: `EMAIL_RECEIVER_UNIT_TEST="laamirilaamiri@gmail.com"`
+
+#### PASSWORD_UNIT_TEST
+- **Description**: The password used for unit tests.
+- **Example**: `PASSWORD_UNIT_TEST="fyxx cazo wmyo mnfu"`
+
+
+
 ## Running the app : 
 ```bash
 # Run application
-$ uvicorn src.main:app --host 127.0.0.1 --port 5000 --reload
+$ python3 scripts/database.py ; uvicorn src.main:app --host 127.0.0.1 --port 5000 --reload
 ```
 ## Build Docker image : 
 ```bash
@@ -41,58 +83,97 @@ $ docker pull ouail02/ema-back:tagname
 $ docker run -p you_port:5000 ema-back:tagname
 ```
 
-## Endpoints
+## API Endpoints Documentation
 
-### 1. GET /
-- **Description:** Returns a message indicating that the service is working properly.
-- **Response:** JSON object with a message.
-- **Status Code:** 200 OK
+### `/api/`
 
-### 2. POST /send/
-- **Description:** Sends emails to the specified recipients.
-- **Request:**
-  - **emails:** UploadFile (TXT file containing email addresses)
-  - **email_body:** str (Email body text)
-  - **resume:** UploadFile (PDF file containing resume)
-  - **sender_email:** str (Sender's email address)
-  - **sender_password:** str (Sender's email password)
-  - **email_subject:** str (Email subject)
-  - **file_separator:** str (Separator used in the email file)
-- **Response:** 
-  - **success_receiver:** list (List of successfully sent email addresses)
-  - **failed_receiver:** list (List of email addresses that failed to send)
-- **Possible Responses:**
-  - **200 OK:** The request was successful, and emails were sent to all recipients.
+#### `GET /`
+- **Description**: Endpoint to check if the API is running properly.
+- **Response**:
+  - **Status Code**: 200 OK
+  - **Response Body**:
     ```json
     {
-        "success_receiver": ["recipient1@example.com", "recipient2@example.com"],
-        "failed_receiver": ["recipient3@example.com"]
+        "message": "I am working good !"
     }
     ```
-  - **400 Bad Request:** The request was malformed or missing required parameters.
+
+### `/api/email/send-internship`
+
+#### `POST /email/send-internship`
+- **Description**: Endpoint to send internship emails.
+- **Request Body**:
+  - `emails` (file): A text file containing email addresses.
+  - `email_body` (string): The body of the email to be sent.
+  - `resume` (file): The resume file to be attached.
+  - `sender_email` (string): The sender's email address.
+  - `sender_password` (string): The sender's email password.
+  - `email_subject` (string): The subject of the email.
+  - `file_separator` (string): The separator used in the emails file.
+- **Response**:
+  - **Status Code**: 200 OK
+  - **Response Body**:
     ```json
     {
-        "detail": "Emails TXT files are missing."
+        "success_receiver": ["email1@example.com", "email2@example.com"],
+        "failed_receiver": ["email3@example.com"]
     }
     ```
-  - **422 Unprocessable Entity:** The request parameters were valid, but the server was unable to process the request due to semantic errors.
+- **Possible Errors**:
+  - 400 Bad Request:
+    - If the emails file is missing.
+    - If the resume file is missing.
+    - If the emails file is not a TXT file.
+    - If the resume file is not a PDF file.
+    - If the password form is incorrect.
+    - If the email form is incorrect.
+  - 503 Service Unavailable:
+    - If failed to connect to the sender's email account.
+- **Field Formats**:
+  - `emails` (file): A text file containing email addresses separated by the specified separator.
+  - `email_body` (string): Html string.
+  - `resume` (file): A PDF file.
+  - `sender_email` (string): A valid email address.
+  - `sender_password` (string): A password following a specific format (four segments separated by spaces, each segment exactly four characters long).
+  - `email_subject` (string): Any string.
+  - `file_separator` (string): Any string used to separate email addresses in the emails file.
+
+
+
+### `/api/users/`
+
+#### `POST /users/`
+- **Description**: Endpoint to create a new user.
+- **Request Body**:
+  - `username` (string): The username of the new user.
+  - `email` (string): The email address of the new user.
+  - `linkedin_link` (string, optional): The LinkedIn profile link of the new user.
+  - `password` (string): The password of the new user.
+  - `phone_number` (string): The phone number of the new user.
+  - `email_password` (string): The password for the user's email account.
+- **Response**:
+  - **Status Code**: 200 OK
+  - **Response Body**:
     ```json
     {
-        "detail": "The email form is incorrect"
+        "message": "User created successfully"
     }
     ```
-  - **601 The server declined the request:** The request parameters were valid, but the email and password not valid.
-    ```json
-    {
-        "detail": "Failed to connect to gmail."
-    }
-    ```
-  - **500 Internal Server Error:** The server encountered an unexpected error while processing the request.
-    ```json
-    {
-        "detail": "Internal Server Error"
-    }
-    ```
+- **Possible Errors**:
+  - 400 Bad Request:
+    - If the email is invalid.
+    - If the email password structure is invalid.
+    - If the password structure is invalid.
+    - If the LinkedIn profile link structure is invalid.
+- **Field Formats**:
+  - `username` (string): Any string.
+  - `email` (string): A valid email address.
+  - `linkedin_link` (string, optional): A LinkedIn profile link or an empty string.
+  - `password` (string): A password following a specific format (contains at least one lowercase character, one uppercase character, one digit, and has a minimum length of 8 characters).
+  - `phone_number` (string): Any string.
+  - `email_password` (string, optional): A password following a specific format (four segments separated by spaces, each segment exactly four characters long), or an empty string.
+
+
 
 ## Project Structure :
 This project's directory structure is inspired by the article "[Structuring a FastAPI App: An In-Depth Guide](https://medium.com/@ketansomvanshi007/structuring-a-fastapi-app-an-in-depth-guide-cdec3b8f4710)" on Medium.

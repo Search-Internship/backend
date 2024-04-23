@@ -97,9 +97,13 @@ def create_user(
     linkedin_link: str = Form(None),
     password: str = Form(...),
     phone_number: str = Form(...),
-    email_password: str = Form(...)
+    email_password: str = Form(None)
 ):
     try:
+        if linkedin_link is None:
+            linkedin_link=''
+        if email_password is None:
+            email_password=''
         # Check if email is valid
         if not is_valid_email(email):
             raise EmailException("Invalid email")
