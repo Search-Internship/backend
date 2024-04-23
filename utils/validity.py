@@ -102,10 +102,11 @@ def is_linkedin_profile_link(url):
         False
     """
     # Regular expression pattern for matching LinkedIn profile links
-    pattern = r"^https?://(?:www\.)?linkedin\.com/(?:in|pub)/[a-zA-Z0-9_-]+$"
-
+    pattern = r"^https?://(?:www\.)?linkedin\.com/(?:in|pub)/[a-zA-Z0-9_-]+/?$"
     # Check if the provided URL matches the pattern
     if re.match(pattern, url):
         return True
     else:
         return False
+    
+

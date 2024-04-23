@@ -1,5 +1,5 @@
 import uuid
-from sqlalchemy import Column, String
+from sqlalchemy import Column, String,inspect
 from passlib.hash import sha256_crypt
 from cryptography.fernet import Fernet  # For encryption
 import os
@@ -7,9 +7,12 @@ import sys
 
 parent_dir = os.path.abspath(os.path.join(os.getcwd(), '.'))
 sys.path.append(parent_dir)
-from models import Base
 from database import session
+from sqlalchemy.ext.declarative import declarative_base
 
+
+# Base class for ORM
+Base = declarative_base()
 # Define User model
 class User(Base):
     __tablename__ = 'users'

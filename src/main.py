@@ -20,24 +20,23 @@ from utils.validity import (is_gmail_password_structure,is_valid_email,
 import shutil
 from pathlib import Path
 from models.user import User
+from dotenv import load_dotenv
 
+# Load variables from the specified .env file
+load_dotenv(dotenv_path=str(Path("./env/secrets.env")))
 
-
-
-
-
-
+encryption_key=os.getenv("FERNET_KEY")
 
 app = FastAPI()
 
 # Create a router for API endpoints
 api_router = APIRouter(prefix="/api")
 
-@app.get("/")
+@api_router.get("/")
 def index():
     return {"messgae":"I am working good !"}
 
-@app.post("/email/send-internship")
+@api_router.post("/email/send-internship")
 async def send_emails(emails: UploadFile = File(None), email_body: str = Form(...),
                       resume: UploadFile = File(None), sender_email: str = Form(...), 
                       sender_password: str = Form(...), email_subject: str = Form(...), 
@@ -91,7 +90,7 @@ async def send_emails(emails: UploadFile = File(None), email_body: str = Form(..
     
     return {"success_receiver": success_receiver, "failed_receiver": failed_receiver},status.HTTP_200_OK
 
-@app.post("/user/")
+@api_router.post("/users/")
 def create_user(
     username: str = Form(...),
     email: str = Form(...),
@@ -106,24 +105,20 @@ def create_user(
             raise EmailException("Invalid email")
 
         # Check if email password has correct structure
-        if not is_gmail_password_structure(email_password) and not email_password=="":
+        if not is_gmail_password_structure(email_password) and email_password!='':
             raise PasswordException("Invalid email password structure")
 
         # Check if email password has correct structure
         if not is_valid_password(password):
-            raise PasswordException("Invalid email password structure")
+            raise PasswordException("Invalid password structure")
         
         # Check if linkdin link has correct structure
         if not is_linkedin_profile_link(linkedin_link) and not linkedin_link=="":
             raise LinkException("Invalid linkdin link structure")
         
 
-        # Check Gmail connection
-        if not check_gmail_connection():
-            raise EmailConnectionFailedException("Failed to connect to email server")
-
         # Save user to database
-        User.create_user(username, email, linkedin_link, password, phone_number, email_password)
+        User.create_user(username, email, linkedin_link, password, phone_number, email_password,encryption_key)
 
         # Send confirmation email
         # send_email_smtp(email, "User Created", "Your account has been successfully created.")
@@ -131,21 +126,6 @@ def create_user(
         return {"message": "User created successfully"}
     except (EmailException, PasswordException, EmailConnectionFailedException) as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 # Include the API router in the main app
