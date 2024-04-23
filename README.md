@@ -202,7 +202,9 @@ $ docker run -p you_port:5000 ema-back:tagname
         "access_token": "your-access-token",
         "token_type": "bearer"
     }
-    ```### `/api/users/login`
+    ```
+
+### `/api/users/login`
 #### `POST /`
 - **Description**: Endpoint to authenticate a user and generate an access token.
 - **Parameters**:
