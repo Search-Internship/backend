@@ -111,14 +111,22 @@ function main {
     update_env_variable "env\database.env" "DB_TYPE" "$db_type"
     update_env_variable "env\database.env" "USER_NAME" "root"
     update_env_variable "env\database.env" "PASSWORD" "admin"
+    update_env_variable "env\database.env" "DB_FILE_PATH" "database/data.db"
     if ($db_type -eq "mysql" -or $db_type -eq "mariadb") {
-        update_env_variable "env\database.env" "PORT" "3306"
-    } elseif ($db_type -eq "oracle" -or $db_type -eq "oracledb" -or $db_type -eq "mssql" -or $db_type -eq "sqlserver" -or $db_type -eq "postgresql") {
-        update_env_variable "env\database.env" "PORT" "3306"
+        update_env_variable "env/database.env" "PORT" "3306"
+    }
+    elseif ($db_type -eq "oracle" -or $db_type -eq "oracledb") {
+        update_env_variable "env/database.env" "PORT" "1521"
+    }
+    elseif ($db_type -eq "mssql" -or $db_type -eq "sqlserver") {
+        update_env_variable "env/database.env" "PORT" "1433"
+    }
+    elseif ($db_type -eq "postgresql") {
+        update_env_variable "env/database.env" "PORT" "5432"
     }
 
-    # Additional environment files and variables can be set here
-}
+        # Additional environment files and variables can be set here
+    }
 
 # Execute the main function with command-line argument
 main $args

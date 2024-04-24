@@ -106,14 +106,15 @@ main() {
     update_env_variable "env/database.env" "DB_TYPE" "$db_type"
     update_env_variable "env/database.env" "USER_NAME" "root"
     update_env_variable "env/database.env" "PASSWORD" "admin"
+    update_env_variable "env/database.env" "DB_FILE_PATH" "database/data.db"
     if [ "$db_type" = "mysql" ] || [ "$db_type" = "mariadb" ]; then
         update_env_variable "env/database.env" "PORT" "3306"
     elif [ "$db_type" = "oracle" ] || [ "$db_type" = "oracledb" ]; then
-        update_env_variable "env/database.env" "PORT" "3306"
+        update_env_variable "env/database.env" "PORT" "1521"
     elif [ "$db_type" = "mssql" ] || [ "$db_type" = "sqlserver" ]; then
-        update_env_variable "env/database.env" "PORT" "3306"
+        update_env_variable "env/database.env" "PORT" "1433"
     elif [ "$db_type" = "postgresql" ]; then
-        update_env_variable "env/database.env" "PORT" "3306"
+        update_env_variable "env/database.env" "PORT" "5432"
     fi
 
     # Additional environment files and variables can be set here

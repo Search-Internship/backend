@@ -21,24 +21,28 @@ $ pip install -r requirements/prod.txt
 ## Envirenment Variable :
 ### 1. `env/database.env` :
 #### USER_NAME
-- **Description**: The username used to authenticate to the MySQL database.
+- **Description**: The username used to authenticate to the database.
 - **Example**: `USER_NAME="root"`
 
 #### PASSWORD
-- **Description**: The password used to authenticate to the MySQL database.
+- **Description**: The password used to authenticate to the database.
 - **Example**: `PASSWORD="admin"`
 
 #### PORT
-- **Description**: The port number on which the MySQL database server is listening.
+- **Description**: The port number on which the database server is listening.
 - **Example**: `PORT="3306"`
 
 #### HOST
-- **Description**: The hostname or IP address of the MySQL database server.
+- **Description**: The hostname or IP address of the database server.
 - **Example**: `HOST="localhost"`
 
 #### DB_NAME
-- **Description**: The name of the MySQL database.
+- **Description**: The name of the database.
 - **Example**: `DB_NAME="easyinternship"`
+
+#### DB_TYPE
+- **Description**: The type of the database ['mysql','mariadb','postgresql','oracle','oracledb','mssql','sqlserver','sqlite'].
+- **Example**: `DB_TYPE="mysql"`
 
 ### 2. `env/secrets.env` :
 #### FERNET_KEY
@@ -52,8 +56,12 @@ $ pip install -r requirements/prod.txt
 - **Description**: The duration (in minutes) after which JWT access tokens expire.
 - **Example**: `ACCESS_TOKEN_EXPIRE_MINUTES=60`
 
-#### SECRET_KEY
+#### JWT_SECRET_KEY
 - **Description**: The secret key used for JWT token encoding and decoding.
+- **Example**: `SECRET_KEY="abababababababbabhha"`
+
+#### PDF_ENCRYPTION_SECRET
+- **Description**: The secret key used for PDF encryption and decryption.
 - **Example**: `SECRET_KEY="abababababababbabhha"`
 
 ### 3. `env/tests.env` :
@@ -69,6 +77,14 @@ $ pip install -r requirements/prod.txt
 - **Description**: The password used for unit tests.
 - **Example**: `PASSWORD_UNIT_TEST="fyxx cazo wmyo mnfu"`
 
+### 4. `env/communication.env` :
+#### EMAIL_PROJECT
+- **Description**: The password of project used for send emails for users.
+- **Example**: `EMAIL_SENDER_UNIT_TEST="laamiri.laamiri@etu.uae.ac.ma"`
+
+#### PASSWORD_EMAIL_PROJECT
+- **Description**: The password of project used for send emails for users.
+- **Example**: `PASSWORD_UNIT_TEST="fyxx cazo wmyo mnfu"`
 
 
 ## Running the app : 

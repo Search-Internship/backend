@@ -1,4 +1,4 @@
-
+from pathlib import Path
 
 def get_database_url(database_type:str="",username:str="",password:str="",port:str="",host:str="",database_name:str="",db_file_path:str=""):
     """
@@ -23,7 +23,7 @@ def get_database_url(database_type:str="",username:str="",password:str="",port:s
         elif str(database_type).lower() in ["oracle","oracledb"]:
             return f"oracle+cx_oracle://{username}:{password}@{host}:{port}/{database_name}"
         elif str(database_type).lower()=="sqlite":
-            return f"sqlite:///{db_file_path}"
+            return f"sqlite:///{str(Path(db_file_path))}"
         elif str(database_type).lower() in ["sqlserver","mssql"]:
             return f"mssql+pyodbc://{username}:{password}@{host}:{port}/{database_name}"
         else:

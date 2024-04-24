@@ -163,14 +163,15 @@ if __name__=="__main__":
     update_env_variable(str(Path("env/database.env")),"DB_TYPE",f"{db_type}")
     update_env_variable(str(Path("env/database.env")),"USER_NAME","root")
     update_env_variable(str(Path("env/database.env")),"PASSWORD","admin")
-    if db_type in ["mysql","mariadb"]:
-        update_env_variable(str(Path("env/database.env")),"PORT","3306")
-    elif db_type in ["oracle","oracledb"]:
-        update_env_variable(str(Path("env/database.env")),"PORT","3306")
-    elif db_type in ["mssql","sqlserver"]:
-        update_env_variable(str(Path("env/database.env")),"PORT","3306")
-    elif db_type=="postgresql":
-        update_env_variable(str(Path("env/database.env")),"PORT","3306")
+    update_env_variable(str(Path("env/database.env")),"DB_FILE_PATH","database/data.db")
+    if db_type in ["mysql", "mariadb"]:
+        update_env_variable(str(Path("env/database.env")), "PORT", "3306")
+    elif db_type in ["oracle", "oracledb"]:
+        update_env_variable(str(Path("env/database.env")), "PORT", "1521")
+    elif db_type in ["mssql", "sqlserver"]:
+        update_env_variable(str(Path("env/database.env")), "PORT", "1433")
+    elif db_type == "postgresql":
+        update_env_variable(str(Path("env/database.env")), "PORT", "5432")
     
     ############### Secrets ####################################
     create_file_if_not_exists(str(Path("env/secrets.env")))
