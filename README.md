@@ -152,6 +152,32 @@ $ docker run -p you_port:5000 ema-back:tagname
 
 
 
+### `/api/email/send-verification-code`
+
+#### `POST /email/send-verification-code`
+- **Description**: Endpoint to send a verification code to the provided email address.
+- **Request Body**:
+  - `to` (string): The recipient email address.
+  - `language` (string, optional): The language of the email content (default: "fr").
+- **Response**:
+  - **Status Code**: 200 OK
+  - **Response Body**:
+    ```json
+    {
+        "code": "verification-code"
+    }
+    ```
+- **Possible Errors**:
+  - 400 Bad Request:
+    - If the email form is incorrect.
+  - 503 Service Unavailable:
+    - If failed to connect to the sender's email account.
+- **Field Formats**:
+  - `to` (string): A valid email address.
+  - `language` (string): Any string indicating the language of the email content.
+
+
+
 ### `/api/users/`
 
 #### `POST /users/`
