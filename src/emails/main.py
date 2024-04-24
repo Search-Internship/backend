@@ -121,9 +121,6 @@ def message_from_html(MyEmail: str, MyPhone: str, MyName: str, MyLinkedIn: str, 
     return html_message
 
 
-
-
-
 def check_gmail_connection(email: str, password: str) -> bool:
     """
     Check the connection to a Gmail account using the provided email and password.

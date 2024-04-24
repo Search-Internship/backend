@@ -7,10 +7,10 @@ from utils.file_txt import parse_text_file
 from fastapi import (
                     FastAPI, File, UploadFile, Form, status, HTTPException,APIRouter
                     )   
-from src.exceptions import (
+from exceptions.exceptions import (
                             FileExtensionException,FileNotFoundException,
                             PasswordException,EmailException,EmailConnectionFailedException,
-                            LinkException
+                            LinkException,UserExistException
                             )
 from src.emails.main import (
                             send_email_smtp,check_gmail_connection
@@ -39,6 +39,9 @@ api_router = APIRouter(prefix="/api")
 
 @api_router.get("/")
 async def index():
+    """
+    Index endpoint to check if the server is running.
+    """
     return {"messgae":"I am working good !"}
 
 @api_router.post("/email/send-internship")
@@ -46,6 +49,9 @@ async def send_emails(emails: UploadFile = File(None), email_body: str = Form(..
                       resume: UploadFile = File(None), sender_email: str = Form(...), 
                       sender_password: str = Form(...), email_subject: str = Form(...), 
                       file_separator: str = Form(...)):
+    """
+    Send internship emails with attachments.
+    """
     # Check if any of the files are null
     if emails is None:
         raise FileNotFoundException(detail="Emails TXT files are missing.")
@@ -97,14 +103,17 @@ async def send_emails(emails: UploadFile = File(None), email_body: str = Form(..
 
 @api_router.post("/email/send-verification-code")
 async def send_verification_email_code(to: str = Form(...),language:str = Form("fr")):
+    """
+    Send a verification code to the provided email address.
+    """
     if not is_valid_email(to):
         raise EmailException(detail="The email form is incorrect")
     #Check the validity of email and password to connect to gmail
     if not check_gmail_connection(EMAIL_PROJECT,PASSWORD_EMAIL_PROJECT):
         raise EmailConnectionFailedException("Failed to connect to gmail.")
     code_generated:str=generate_random_code()
-    email_subject:str=""
-    email_body:str=""
+    email_subject:str="Verification code"
+    email_body:str=f"<h1>Your code is {code_generated}</h1>"
     is_send:bool=send_email_smtp(
         sender_email=EMAIL_PROJECT,
         sender_password=PASSWORD_EMAIL_PROJECT,
@@ -127,6 +136,9 @@ async def create_user(
     phone_number: str = Form(...),
     email_password: str = Form(None)
 ):
+    """
+    Create a new user.
+    """
     try:
         if linkedin_link is None:
             linkedin_link=''
@@ -150,8 +162,10 @@ async def create_user(
         
 
         # Save user to database
-        User.create_user(username, email, linkedin_link, password, phone_number, email_password,FERNET_KEY)
-
+        is_created:bool=User.create_user(username, email, linkedin_link, password, phone_number, email_password,FERNET_KEY)
+        if not is_created:
+            raise UserExistException(f"User already exist with this email {email}")
+        
         # Send confirmation email
         # send_email_smtp(email, "User Created", "Your account has been successfully created.")
 
@@ -165,6 +179,9 @@ async def login(
     email: str = Form(...),
     password: str = Form(...)
 ):
+    """
+    User login.
+    """
     # Verify login credentials
     is_valid_login, user_id = User.verify_login(email, password)
     

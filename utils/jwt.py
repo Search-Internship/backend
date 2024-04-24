@@ -15,6 +15,15 @@ ALGORITHM=os.getenv("ALGORITHM")
 
 # Function to create access token
 def create_access_token(user_id: str) -> str:
+    """
+    Create an access token for a user.
+
+    Parameters:
+        user_id (str): The user ID for whom the access token is being generated.
+
+    Returns:
+        str: The encoded JWT access token.
+    """
     expires_delta = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     expire = datetime.now(timezone.utc) + expires_delta
     to_encode = {"sub": user_id, "exp": expire}
@@ -24,6 +33,17 @@ def create_access_token(user_id: str) -> str:
 
 # Function to verify and decode JWT token
 def decode_access_token(token: str) -> dict:
+    """
+    Decode and verify a JWT access token.
+
+    Parameters:
+        token (str): The JWT access token to decode and verify.
+
+    Returns:
+        dict: A dictionary containing the validation result and user ID.
+            - 'valid' (bool): True if the token is valid, False otherwise.
+            - 'user_id' (str or None): The user ID if the token is valid, None otherwise.
+    """
     try:
         # Decode the token
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
