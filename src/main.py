@@ -21,16 +21,16 @@ import shutil
 from pathlib import Path
 from models.user import User
 from utils.jwt import create_access_token,decode_access_token
+from utils.generate import generate_random_code
 from dotenv import load_dotenv
 
 # Load variables from the specified .env file
 load_dotenv(dotenv_path=str(Path("./env/secrets.env")))
+load_dotenv(dotenv_path=str(Path("./env/communication.env")))
 
-encryption_key=os.getenv("FERNET_KEY")
-ACCESS_TOKEN_EXPIRE_MINUTES=os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES")
-SECRET_KEY=os.getenv("SECRET_KEY")
-ALGORITHM=os.getenv("ALGORITHM")
-
+FERNET_KEY:str=os.getenv("FERNET_KEY")
+EMAIL_PROJECT:str=os.getenv("EMAIL_PROJECT")
+PASSWORD_EMAIL_PROJECT:str=os.getenv("PASSWORD_EMAIL_PROJECT")
 
 app = FastAPI()
 
@@ -93,7 +93,30 @@ async def send_emails(emails: UploadFile = File(None), email_body: str = Form(..
     os.remove(f"{temp_dir}/emails.txt")
     os.remove(f"{temp_dir}/resume.pdf")
     
-    return {"success_receiver": success_receiver, "failed_receiver": failed_receiver},status.HTTP_200_OK
+    return {"success_receiver": success_receiver, "failed_receiver": failed_receiver}
+
+@api_router.post("/email/send-verification-code")
+async def send_verification_email_code(to: str = Form(...),language:str = Form("fr")):
+    if not is_valid_email(to):
+        raise EmailException(detail="The email form is incorrect")
+    #Check the validity of email and password to connect to gmail
+    if not check_gmail_connection(EMAIL_PROJECT,PASSWORD_EMAIL_PROJECT):
+        raise EmailConnectionFailedException("Failed to connect to gmail.")
+    code_generated:str=generate_random_code()
+    email_subject:str=""
+    email_body:str=""
+    is_send:bool=send_email_smtp(
+        sender_email=EMAIL_PROJECT,
+        sender_password=PASSWORD_EMAIL_PROJECT,
+        to=to,
+        email_subject=email_subject,
+        email_body=email_body
+    )
+
+    return {"code":(code_generated if is_send else "")}  
+    
+
+
 
 @api_router.post("/users/")
 async def create_user(
@@ -127,7 +150,7 @@ async def create_user(
         
 
         # Save user to database
-        User.create_user(username, email, linkedin_link, password, phone_number, email_password,encryption_key)
+        User.create_user(username, email, linkedin_link, password, phone_number, email_password,FERNET_KEY)
 
         # Send confirmation email
         # send_email_smtp(email, "User Created", "Your account has been successfully created.")
@@ -143,7 +166,7 @@ async def login(
     password: str = Form(...)
 ):
     # Verify login credentials
-    is_valid_login, user_id = User.verify_login(email, password, encryption_key)
+    is_valid_login, user_id = User.verify_login(email, password)
     
     if not is_valid_login:
         raise HTTPException(status_code=401, detail="Invalid credentials")

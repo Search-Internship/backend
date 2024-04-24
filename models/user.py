@@ -24,27 +24,27 @@ class User(Base):
     phone_number = Column(String)
     email_password = Column(String)  # Store encrypted email password
 
-    def set_password(self, password):
+    def set_password(self, password:str)->None:
         # Hashing the password
         self.password_hash = sha256_crypt.hash(password)
 
-    def check_password(self, password):
+    def check_password(self, password:str)->None:
         # Verifying the password
         return sha256_crypt.verify(password, self.password_hash)
 
-    def set_email_password(self, email_password, encryption_key):
+    def set_email_password(self, email_password:str, encryption_key:str)->None:
         # Encrypt the email password
         cipher_suite = Fernet(encryption_key)
         self.email_password = cipher_suite.encrypt(email_password.encode()).decode()
 
-    def get_email_password(self, encryption_key):
+    def get_email_password(self, encryption_key:str)->str:
         # Decrypt the email password
         cipher_suite = Fernet(encryption_key)
         decrypted_password = cipher_suite.decrypt(self.email_password.encode()).decode()
         return decrypted_password
 
     @classmethod
-    def create_user(cls, username, email, linkedin_link, password, phone_number, email_password, encryption_key):
+    def create_user(cls, username:str, email:str, linkedin_link:str, password:str, phone_number:str, email_password:str, encryption_key:str):
         # Create a new user instance
         new_user = cls(
             username=username,
@@ -61,7 +61,7 @@ class User(Base):
         session.commit()
 
     @classmethod
-    def verify_login(cls, email, password, encryption_key):
+    def verify_login(cls, email:str, password:str):
         # Find user email
         user = session.query(cls).filter(cls.email == email).first()
         if user:
