@@ -20,17 +20,27 @@ from utils.validity import (is_gmail_password_structure,is_valid_email,
 import shutil
 from pathlib import Path
 from models.user import User
-from utils.jwt import create_access_token,decode_access_token
+from utils.jwt import (
+                        create_access_token,decode_access_token
+                      )
+from utils.file_pdf import (
+                            encrypt_pdf_to_base64,decrypt_pdf_from_base64
+                            )
 from utils.generate import generate_random_code
 from dotenv import load_dotenv
 
 # Load variables from the specified .env file
 load_dotenv(dotenv_path=str(Path("./env/secrets.env")))
 load_dotenv(dotenv_path=str(Path("./env/communication.env")))
+load_dotenv(dotenv_path=str(Path("./env/secrets.env")))
 
+ACCESS_TOKEN_EXPIRE_MINUTES=int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES"))
+JWT_SECRET_KEY=os.getenv("JWT_SECRET_KEY")
+ALGORITHM=os.getenv("ALGORITHM")
 FERNET_KEY:str=os.getenv("FERNET_KEY")
 EMAIL_PROJECT:str=os.getenv("EMAIL_PROJECT")
 PASSWORD_EMAIL_PROJECT:str=os.getenv("PASSWORD_EMAIL_PROJECT")
+PDF_ENCRYPTION_SECRET:str=os.getenv("PDF_ENCRYPTION_SECRET")
 
 app = FastAPI()
 
@@ -189,7 +199,7 @@ async def login(
         raise HTTPException(status_code=401, detail="Invalid credentials")
     
     # Create access token
-    access_token = create_access_token(user_id)
+    access_token = create_access_token(user_id,ACCESS_TOKEN_EXPIRE_MINUTES,JWT_SECRET_KEY,ALGORITHM)
     return {"access_token": access_token, "token_type": "bearer"}
 
 # Include the API router in the main app

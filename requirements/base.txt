@@ -5,6 +5,5 @@ PyPDF2
 sqlalchemy
 passlib
 cryptography
-mysql-connector-python
 python-dotenv
 python-jose

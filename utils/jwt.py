@@ -1,52 +1,21 @@
 from jose import jwt
 from datetime import datetime, timedelta, timezone
-import os
-import sys
-parent_dir = os.path.abspath(os.path.join(os.getcwd(), '.'))
-sys.path.append(parent_dir)
-from dotenv import load_dotenv
-from pathlib import Path
-# Load variables from the specified .env file
-load_dotenv(dotenv_path=str(Path("./env/secrets.env")))
 
-ACCESS_TOKEN_EXPIRE_MINUTES=int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES"))
-SECRET_KEY=os.getenv("SECRET_KEY")
-ALGORITHM=os.getenv("ALGORITHM")
 
 # Function to create access token
-def create_access_token(user_id: str) -> str:
-    """
-    Create an access token for a user.
-
-    Parameters:
-        user_id (str): The user ID for whom the access token is being generated.
-
-    Returns:
-        str: The encoded JWT access token.
-    """
-    expires_delta = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+def create_access_token(user_id: str,access_token_expire_minutes:str,jwt_secret_key:str,algorithm:str) -> str:
+    expires_delta = timedelta(minutes=access_token_expire_minutes)
     expire = datetime.now(timezone.utc) + expires_delta
     to_encode = {"sub": user_id, "exp": expire}
-    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    encoded_jwt = jwt.encode(to_encode, jwt_secret_key, algorithm=algorithm)
     return encoded_jwt
 
 
 # Function to verify and decode JWT token
-def decode_access_token(token: str) -> dict:
-    """
-    Decode and verify a JWT access token.
-
-    Parameters:
-        token (str): The JWT access token to decode and verify.
-
-    Returns:
-        dict: A dictionary containing the validation result and user ID.
-            - 'valid' (bool): True if the token is valid, False otherwise.
-            - 'user_id' (str or None): The user ID if the token is valid, None otherwise.
-    """
+def decode_access_token(token: str,jwt_secret_key:str,algorithm:str) -> dict:
     try:
         # Decode the token
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        payload = jwt.decode(token, jwt, algorithms=[algorithm])
         
         # Convert expiration time from seconds since epoch to datetime object
         expiration_time = datetime.fromtimestamp(payload["exp"], timezone.utc)
