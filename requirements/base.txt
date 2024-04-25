@@ -7,4 +7,3 @@ passlib
 cryptography
 python-dotenv
 python-jose
-Pillow

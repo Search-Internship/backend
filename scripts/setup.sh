@@ -28,13 +28,21 @@ update_env_variable() {
     variable_name=$2
     value=$3
     print_value=$4
+
+    # Delete the line if it exists
+    sed -i "/^$variable_name=/d" "$file_path"
+
+    # Add the new variable to the file
     echo "$variable_name=$value" >> "$file_path"
+
+    # Print the appropriate message based on the print_value flag
     if [ "$print_value" = true ]; then
         echo "Variable '$variable_name' set to '$value' in '$file_path' file."
     else
         echo "Variable '$variable_name' set to '****' in '$file_path' file."
     fi
 }
+
 
 # Function to install a Python module
 install_python_module() {
@@ -74,7 +82,6 @@ install_requirements() {
 
 # Function to read password securely
 read_password() {
-    prompt=$1
     password=""
     while IFS= read -r -s -n 1 char; do
         if [[ $char == $'\0' ]]; then
@@ -91,6 +98,27 @@ read_password() {
         fi
     done
     echo
+}
+
+is_gmail_password_structure() {
+    # Define the password structure regex pattern
+    local pattern='^.... .... .... ....$'
+    
+    # Check if the password matches the pattern
+    if [[ "$1" =~ $pattern ]]; then
+        return 0
+    else
+        return 1
+    fi
+}
+
+is_valid_email() {
+    local email=$1
+    if [[ "$email" =~ ^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$ ]]; then
+        return 0
+    else
+        return 1
+    fi
 }
 
 
@@ -133,44 +161,152 @@ main() {
         default_db_name="easyinternship"
         default_host="localhost"
         default_user_name="root"
-        default_password="admin"
+        default_password=""
         echo "Enter the database ($db_type) details:"
+        echo
         read -p "Enter the database name (default is $default_db_name): " db_name
+        echo
         read -p "Enter the host (default is $default_host): " host
+        echo
         read -p "Enter the username (default is $default_user_name): " user_name
-        stty -echo
-        read -p "Enter the password (default is $default_password): " password
-        stty echo
+        echo
+        echo -n "Enter the password (default is vide): "
+        read_password
         echo
         
 
-        update_env_variable "env/database.env" "DB_NAME" "${db_name:-default_db_name}"
-        update_env_variable "env/database.env" "HOST" "${host:-default_host}"
-        update_env_variable "env/database.env" "DB_TYPE" "${db_type:-default_db_type}"
-        update_env_variable "env/database.env" "USER_NAME" "${user_name:-default_user_name}"
-        update_env_variable "env/database.env" "PASSWORD" "${password:-default_password}"
+        update_env_variable "env/database.env" "DB_NAME" "${db_name:-$default_db_name}" true
+        update_env_variable "env/database.env" "HOST" "${host:-$default_host}" true
+        update_env_variable "env/database.env" "DB_TYPE" "${db_type:-$default_db_type}" true
+        update_env_variable "env/database.env" "USER_NAME" "${user_name:-$default_user_name}" true
+        update_env_variable "env/database.env" "PASSWORD" "${password:-$default_password}" false
 
     fi
     
 
     if [ "$db_type" = "mysql" ] || [ "$db_type" = "mariadb" ]; then
         read -p "Enter the port (default is 3306): " port
-        update_env_variable "env/database.env" "PORT" "${port:-3306}"
+        update_env_variable "env/database.env" "PORT" "${port:-3306}" true
+        echo
     elif [ "$db_type" = "oracle" ] || [ "$db_type" = "oracledb" ]; then
-        read -p "Enter the port (default is 1521): " port
-        update_env_variable "env/database.env" "PORT" "${port:-1521}"
+        read -p "Enter the port (default is 1521): " port 
+        update_env_variable "env/database.env" "PORT" "${port:-1521}" true
     elif [ "$db_type" = "mssql" ] || [ "$db_type" = "sqlserver" ]; then
-        read -p "Enter the port (default is 1433): " port
-        update_env_variable "env/database.env" "PORT" "${port:-1433}"
+        read -p "Enter the port (default is 1433): " port 
+        update_env_variable "env/database.env" "PORT" "${port:-1433}" true
     elif [ "$db_type" = "postgresql" ]; then
-        read -p "Enter the port (default is 5432): " port
-        update_env_variable "env/database.env" "PORT" "${port:-5432}"
+        read -p "Enter the port (default is 5432): " port 
+        update_env_variable "env/database.env" "PORT" "${port:-5432}" true
     elif [ "$db_type" = "sqlite" ]; then
         read -p "Enter the database file path: " db_file_path
-        update_env_variable "env/database.env" "DB_FILE_PATH" "$db_file_path"
+        update_env_variable "env/database.env" "DB_FILE_PATH" "$db_file_path" true
     fi
 
-    # Additional environment files and variables can be set here
+    echo "Application Communication Details:"
+    echo
+    while true; do
+        read -p "Enter the email address: " email_address
+
+        # Check if the email address is valid
+        if is_valid_email "$email_address"; then
+            break  # Break the loop if email address is valid
+        else
+            echo
+            echo "Error: Invalid email address '$email_address'."
+        fi
+    done
+
+    # Loop until a valid email password is entered
+    echo
+    while true; do
+        echo -n "Enter the email password (xxxx xxxx xxxx xxxx): "
+        read_password
+
+        # Call your function to validate email password structure
+        if is_gmail_password_structure "$password"; then
+            break
+        else
+            echo "Error: Invalid email password structure. Password must consist of four segments separated by spaces, each segment must be exactly four characters long."
+        fi
+    done
+
+    update_env_variable "env/communication.env" "EMAIL_PROJECT" "$email_address" true
+    update_env_variable "env/communication.env" "PASSWORD_EMAIL_PROJECT" "$password" false
+
+
+    echo "Application Security Details:"
+    echo
+    FERNET_KEY="Zsy6-8REWdN0-FkIhgBy8k19MJ7elYNAv3MxkWHFGOk="
+    ACCESS_TOKEN_EXPIRE_MINUTES=60
+    JWT_SECRET_KEY="abababababababbabhha"
+    ALGORITHM="HS256"
+    PDF_ENCRYPTION_SECRET="pdfababababab"
+    read -p "FERNET KEY (default is $FERNET_KEY): " fernet_key
+    echo
+    read -p "JWT ACCESS TOKEN EXPIRE MINUTES (default is $ACCESS_TOKEN_EXPIRE_MINUTES): " access_token_expire_minutes
+    echo
+    read -p "JWT KEY (default is $JWT_SECRET_KEY): " jwt_secret_key
+    echo
+    read -p "JWT ALGORITHM (default is $ALGORITHM): " algorithm
+    echo
+    read -p "PDF ENCRYPTION SECRET (default is $PDF_ENCRYPTION_SECRET): " pdf_encryption_secret
+    echo
+    update_env_variable "env/secrets.env" "FERNET_KEY" "${fernet_key:-$FERNET_KEY}" true
+    update_env_variable "env/secrets.env" "ACCESS_TOKEN_EXPIRE_MINUTES" "${access_token_expire_minutes:-$ACCESS_TOKEN_EXPIRE_MINUTES}" true
+    update_env_variable "env/secrets.env" "JWT_SECRET_KEY" "${jwt_secret_key:-$JWT_SECRET_KEY}" true
+    update_env_variable "env/secrets.env" "ALGORITHM" "${algorithm:-$ALGORITHM}" true
+    update_env_variable "env/secrets.env" "PDF_ENCRYPTION_SECRET" "${pdf_encryption_secret:-$PDF_ENCRYPTION_SECRET}" true
+
+    echo "Unit Testing Details: "
+    echo
+    EMAIL_SENDER_UNIT_TEST="laamiri.ouail@etu.uae.ac.ma"
+    EMAIL_RECEIVER_UNIT_TEST="laamiriouail@gmail.com"
+    PASSWORD_UNIT_TEST="cfkd dihq xxyw ugin "
+    while true; do
+        read -p "Enter the email sender for unit test : " email_sender_unit_test
+
+        # Check if the email address is valid
+        if is_valid_email "$email_sender_unit_test"; then
+            break  # Break the loop if email address is valid
+        else
+            echo
+            echo "Error: Invalid email address '$email_sender_unit_test'."
+        fi
+    done
+
+    echo
+    while true; do
+        echo -n "Password for unit test email (xxxx xxxx xxxx xxxx): "
+        read_password
+
+        # Call your function to validate email password structure
+        if is_gmail_password_structure "$password"; then
+            break
+        else
+            echo "Error: Invalid email password structure. Password must consist of four segments separated by spaces, each segment must be exactly four characters long."
+        fi
+    done
+
+    echo
+
+    while true; do
+        read -p "Enter the email receiver for unit test : " email_receiver_unit_test
+
+        # Check if the email address is valid
+        if is_valid_email "$email_receiver_unit_test"; then
+            break  # Break the loop if email address is valid
+        else
+            echo
+            echo "Error: Invalid email address '$email_receiver_unit_test'."
+        fi
+    done
+    
+
+    update_env_variable "env/unit_test.env" "EMAIL_SENDER_UNIT_TEST" "$email_sender_unit_test" true
+    update_env_variable "env/unit_test.env" "EMAIL_RECEIVER_UNIT_TEST" "$email_receiver_unit_test" true
+    update_env_variable "env/unit_test.env" "PASSWORD_UNIT_TEST" "$password" false
+
+    
 
 }
 

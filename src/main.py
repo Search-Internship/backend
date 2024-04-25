@@ -20,6 +20,7 @@ from utils.validity import (is_gmail_password_structure,is_valid_email,
 import shutil
 from pathlib import Path
 from models.user import User
+from models.operations import Operations
 from utils.jwt import (
                         create_access_token,decode_access_token
                       )
@@ -203,6 +204,39 @@ async def login(
     # Create access token
     access_token = create_access_token(user_id,ACCESS_TOKEN_EXPIRE_MINUTES,JWT_SECRET_KEY,ALGORITHM)
     return {"access_token": access_token, "token_type": "bearer"}
+
+@api_router.post("/operations/")
+async def create_operation(
+    from_email: str = Form(...),
+    pdf_base64: str = Form(...),
+    email_body: str = Form(...),
+    subject: str = Form(...),
+    success_receiver: str = Form(...),
+    failed_receiver: str = Form(...),
+    user_id: str = Form(...)
+):
+    """
+    Create a new operation associated with a user.
+    """
+    
+    
+    try:
+        # Create the operation
+        operation = Operations.create_operation(
+            session,
+            from_email=from_email,
+            pdf_base64=pdf_base64,
+            email_body=email_body,
+            subject=subject,
+            success_receiver=success_receiver,
+            failed_receiver=failed_receiver,
+            user_id=user_id
+        )
+        return {"message": "Operation created successfully"}
+    except ValueError as ve:
+        raise UserExistException(detail="User does not exist with the provided user id")
+    
+
 
 # Include the API router in the main app
 app.include_router(api_router)
