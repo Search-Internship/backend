@@ -26,12 +26,13 @@ create_file_if_not_exists() {
 update_env_variable() {
     file_path=$1
     variable_name=$2
-    default_value=$3
-    if ! grep -q "^$variable_name=" "$file_path"; then
-        echo "$variable_name=$default_value" >> "$file_path"
-        echo "Variable '$variable_name' set to '$default_value' in '$file_path' file."
+    value=$3
+    print_value=$4
+    echo "$variable_name=$value" >> "$file_path"
+    if [ "$print_value" = true ]; then
+        echo "Variable '$variable_name' set to '$value' in '$file_path' file."
     else
-        echo "Variable '$variable_name' already exists in '$file_path' file."
+        echo "Variable '$variable_name' set to '****' in '$file_path' file."
     fi
 }
 
@@ -71,10 +72,35 @@ install_requirements() {
     fi
 }
 
+# Function to read password securely
+read_password() {
+    prompt=$1
+    password=""
+    while IFS= read -r -s -n 1 char; do
+        if [[ $char == $'\0' ]]; then
+            break
+        fi
+        if [[ $char == $'\177' ]]; then
+            if [ -n "$password" ]; then
+                password="${password%?}"
+                echo -en "\b \b"
+            fi
+        else
+            password+=$char
+            echo -en "*"
+        fi
+    done
+    echo
+}
+
+
+
+
+
 # Main function
 main() {
     db_type=${1,,}
-    if [[ ! " mysql mariadb postgresql oracle oracledb mssql sqlserver sqlite " =~ " $db_type " ]]; then
+    if [[ ! " mysql mariadb postgresql oracle oracledb mssql sqlserver sqlite" =~ " $db_type " ]]; then
         echo "Usage: $0 db_type"
         echo "And db_type in ['mysql', 'mariadb', 'postgresql', 'oracle', 'oracledb', 'mssql', 'sqlserver', 'sqlite']"
         exit 1
@@ -101,20 +127,47 @@ main() {
 
     create_folder_if_not_exists "env"
     create_file_if_not_exists "env/database.env"
-    update_env_variable "env/database.env" "DB_NAME" "easyinternship"
-    update_env_variable "env/database.env" "HOST" "localhost"
-    update_env_variable "env/database.env" "DB_TYPE" "$db_type"
-    update_env_variable "env/database.env" "USER_NAME" "root"
-    update_env_variable "env/database.env" "PASSWORD" "admin"
-    update_env_variable "env/database.env" "DB_FILE_PATH" "database/data.db"
+
+    
+    if [ "$db_type" != "sqlite" ]; then
+        default_db_name="easyinternship"
+        default_host="localhost"
+        default_user_name="root"
+        default_password="admin"
+        echo "Enter the database ($db_type) details:"
+        read -p "Enter the database name (default is $default_db_name): " db_name
+        read -p "Enter the host (default is $default_host): " host
+        read -p "Enter the username (default is $default_user_name): " user_name
+        stty -echo
+        read -p "Enter the password (default is $default_password): " password
+        stty echo
+        echo
+        
+
+        update_env_variable "env/database.env" "DB_NAME" "${db_name:-default_db_name}"
+        update_env_variable "env/database.env" "HOST" "${host:-default_host}"
+        update_env_variable "env/database.env" "DB_TYPE" "${db_type:-default_db_type}"
+        update_env_variable "env/database.env" "USER_NAME" "${user_name:-default_user_name}"
+        update_env_variable "env/database.env" "PASSWORD" "${password:-default_password}"
+
+    fi
+    
+
     if [ "$db_type" = "mysql" ] || [ "$db_type" = "mariadb" ]; then
-        update_env_variable "env/database.env" "PORT" "3306"
+        read -p "Enter the port (default is 3306): " port
+        update_env_variable "env/database.env" "PORT" "${port:-3306}"
     elif [ "$db_type" = "oracle" ] || [ "$db_type" = "oracledb" ]; then
-        update_env_variable "env/database.env" "PORT" "1521"
+        read -p "Enter the port (default is 1521): " port
+        update_env_variable "env/database.env" "PORT" "${port:-1521}"
     elif [ "$db_type" = "mssql" ] || [ "$db_type" = "sqlserver" ]; then
-        update_env_variable "env/database.env" "PORT" "1433"
+        read -p "Enter the port (default is 1433): " port
+        update_env_variable "env/database.env" "PORT" "${port:-1433}"
     elif [ "$db_type" = "postgresql" ]; then
-        update_env_variable "env/database.env" "PORT" "5432"
+        read -p "Enter the port (default is 5432): " port
+        update_env_variable "env/database.env" "PORT" "${port:-5432}"
+    elif [ "$db_type" = "sqlite" ]; then
+        read -p "Enter the database file path: " db_file_path
+        update_env_variable "env/database.env" "DB_FILE_PATH" "$db_file_path"
     fi
 
     # Additional environment files and variables can be set here

@@ -1,5 +1,5 @@
 import uuid
-from sqlalchemy import Column, String,inspect
+from sqlalchemy import Column, String
 from passlib.hash import sha256_crypt
 from cryptography.fernet import Fernet  # For encryption
 import os
@@ -9,7 +9,7 @@ parent_dir = os.path.abspath(os.path.join(os.getcwd(), '.'))
 sys.path.append(parent_dir)
 from database import session
 from sqlalchemy.ext.declarative import declarative_base
-
+from sqlalchemy.orm import relationship
 
 # Base class for ORM
 Base = declarative_base()
@@ -35,7 +35,8 @@ class User(Base):
     password_hash = Column(String)
     phone_number = Column(String)
     email_password = Column(String)  # Store encrypted email password
-
+    # Define the relationship to the Operations table
+    operations = relationship("Operations", back_populates="user")
     def set_password(self, password:str)->None:
         """
         Set the password for the user.
