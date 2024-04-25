@@ -7,9 +7,10 @@ import sys
 from typing import Union
 parent_dir = os.path.abspath(os.path.join(os.getcwd(), '.'))
 sys.path.append(parent_dir)
-from database import session
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
+import datetime
+
 
 # Base class for ORM
 Base = declarative_base()
@@ -26,6 +27,9 @@ class User(Base):
         password_hash (str): Hashed password for user authentication.
         phone_number (str): User's phone number.
         email_password (str): Encrypted email password.
+        date (str): Date of the operation.
+        time (str): Time of the operation.
+        avatar_base64 (str): Base64 encoded avatar image.
     """
     __tablename__ = 'users'
     id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
@@ -34,6 +38,9 @@ class User(Base):
     linkedin_link = Column(String)
     password_hash = Column(String)
     phone_number = Column(String)
+    date = Column(String)
+    time = Column(String)
+    avatar_base64 = Column(String)
     email_password = Column(String)  # Store encrypted email password
     # Define the relationship to the Operations table
     operations = relationship("Operations", back_populates="user")
@@ -88,7 +95,7 @@ class User(Base):
         return decrypted_password
 
     @classmethod
-    def create_user(cls, username:str, email:str, linkedin_link:str, password:str, phone_number:str, email_password:str, encryption_key:str)->bool:
+    def create_user(cls, session, username:str, email:str, linkedin_link:str, password:str, phone_number:str, email_password:str, encryption_key:str, avatar_base64:str)->bool:
         """
         Create a new user and add them to the database.
 
@@ -100,6 +107,7 @@ class User(Base):
             phone_number (str): User's phone number.
             email_password (str): User's email password.
             encryption_key (str): Encryption key to encrypt email password.
+            avatar_base64 (str): Base64 encoded avatar image.
         Returns:
             bool: The user created or not.
         """
@@ -111,7 +119,10 @@ class User(Base):
             username=username,
             email=email,
             linkedin_link=linkedin_link,
-            phone_number=phone_number
+            phone_number=phone_number,
+            avatar_base64=avatar_base64,
+            date=str(datetime.date.today()),  # Add current date
+            time=str(datetime.datetime.now().time())  # Add current time
         )
         # Set password and email password
         new_user.set_password(password)
@@ -123,7 +134,7 @@ class User(Base):
         return True
 
     @classmethod
-    def verify_login(cls, email:str, password:str)->tuple[bool,Union[str,None]]:
+    def verify_login(cls, session, email:str, password:str)->tuple[bool,Union[str,None]]:
         """
         Verify user login credentials.
 
@@ -143,3 +154,15 @@ class User(Base):
                 user_id = user.id
                 return True, user_id
         return False, None
+    @classmethod
+    def get_user_by_id(cls, session, user_id:str)-> Union['User', None]:
+        """
+        Get a user by user_id.
+
+        Parameters:
+            user_id (str): The user's ID.
+
+        Returns:
+            Union['User', None]: The user object if found, otherwise None.
+        """
+        return session.query(cls).filter(cls.id == user_id).first()

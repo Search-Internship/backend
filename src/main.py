@@ -28,6 +28,8 @@ from utils.file_pdf import (
                             )
 from utils.generate import generate_random_code
 from dotenv import load_dotenv
+from database import session
+
 
 # Load variables from the specified .env file
 load_dotenv(dotenv_path=str(Path("./env/secrets.env")))
@@ -172,7 +174,7 @@ async def create_user(
         
 
         # Save user to database
-        is_created:bool=User.create_user(username, email, linkedin_link, password, phone_number, email_password,FERNET_KEY)
+        is_created:bool=User.create_user(session,username, email, linkedin_link, password, phone_number, email_password,FERNET_KEY)
         if not is_created:
             raise UserExistException(f"User already exist with this email {email}")
         
@@ -193,7 +195,7 @@ async def login(
     User login.
     """
     # Verify login credentials
-    is_valid_login, user_id = User.verify_login(email, password)
+    is_valid_login, user_id = User.verify_login(session,email, password)
     
     if not is_valid_login:
         raise HTTPException(status_code=401, detail="Invalid credentials")
