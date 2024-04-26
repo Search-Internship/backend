@@ -27,6 +27,9 @@ from utils.jwt import (
 from utils.file_pdf import (
                             encrypt_pdf_to_base64,decrypt_pdf_from_base64
                             )
+from utils.file_img import (
+                            encrypt_image_to_base64,decrypt_image_from_base64
+                             )
 from utils.generate import generate_random_code
 from dotenv import load_dotenv
 from database import session
@@ -58,13 +61,21 @@ async def index():
     return {"messgae":"I am working good !"}
 
 @api_router.post("/email/send-internship")
-async def send_emails(emails: UploadFile = File(None), email_body: str = Form(...),
-                      resume: UploadFile = File(None), sender_email: str = Form(...), 
-                      sender_password: str = Form(...), email_subject: str = Form(...), 
+async def send_emails(access_token:str= Form(None),emails: UploadFile = File(None), email_body: str = Form(...),
+                      resume: UploadFile = File(None), email_subject: str = Form(...), 
                       file_separator: str = Form(...)):
     """
     Send internship emails with attachments.
     """
+    decode_token:dict=decode_access_token(access_token,JWT_SECRET_KEY,ALGORITHM)
+    if not decode_token["valid"]:
+        raise HTTPException(status_code=401, detail="Invalid access token")
+    user_id:str=decode_token["user_id"]
+    user:User|None=User.get_user_by_id(session,user_id)
+    if user is None:
+        raise HTTPException(status_code=401, detail="Invalid access token")
+    sender_email:str=user.email
+    sender_password:str=user.email_password
     # Check if any of the files are null
     if emails is None:
         raise FileNotFoundException(detail="Emails TXT files are missing.")
@@ -108,11 +119,26 @@ async def send_emails(emails: UploadFile = File(None), email_body: str = Form(..
             success_receiver.append(email)
         else:
             failed_receiver.append(email)
-
+    try:
+        is_saved_operations:bool=Operations.create_operation(sender_email,encrypt_pdf_to_base64(f"{temp_dir}/resume.pdf"),email_body,email_subject,",".join(success_receiver),",".join(failed_receiver),user_id)
+    except ValueError as ve:
+        raise UserExistException(detail="User does not exist with the provided user id")
     os.remove(f"{temp_dir}/emails.txt")
     os.remove(f"{temp_dir}/resume.pdf")
-    
-    return {"success_receiver": success_receiver, "failed_receiver": failed_receiver}
+    if is_saved_operations:
+        return {"success_receiver": success_receiver, "failed_receiver": failed_receiver,"saved":is_saved_operations}
+    return {"success_receiver": success_receiver, "failed_receiver": failed_receiver,"saved":False}
+
+
+
+
+
+
+
+
+
+
+
 
 @api_router.post("/email/send-verification-code")
 async def send_verification_email_code(to: str = Form(...),language:str = Form("fr")):
@@ -147,7 +173,8 @@ async def create_user(
     linkedin_link: str = Form(None),
     password: str = Form(...),
     phone_number: str = Form(...),
-    email_password: str = Form(None)
+    email_password: str = Form(None),
+    avatar: UploadFile = File(None)
 ):
     """
     Create a new user.
@@ -169,13 +196,19 @@ async def create_user(
         if not is_valid_password(password):
             raise PasswordException("Invalid password structure")
         
-        # Check if linkdin link has correct structure
+        # Check if linkdin link has correct strutxtcture
         if not is_linkedin_profile_link(linkedin_link) and not linkedin_link=="":
             raise LinkException("Invalid linkdin link structure")
-        
-
+        if avatar is not None:
+            avatar_base64:str=""
+        else:
+            temp_dir = str(Path("./temp"))
+            with open(f"{temp_dir}/avatar.png", "wb") as emails_file:
+                shutil.copyfileobj(avatar.file, emails_file)
+            avatar_base64:str=encrypt_image_to_base64(f"{temp_dir}/avatar.png")
+            os.remove(f"{temp_dir}/avatar.png")
         # Save user to database
-        is_created:bool=User.create_user(session,username, email, linkedin_link, password, phone_number, email_password,FERNET_KEY)
+        is_created:bool=User.create_user(session,username, email, linkedin_link, password, phone_number, email_password,FERNET_KEY,avatar_base64)
         if not is_created:
             raise UserExistException(f"User already exist with this email {email}")
         
@@ -207,19 +240,25 @@ async def login(
 
 @api_router.post("/operations/")
 async def create_operation(
-    from_email: str = Form(...),
     pdf_base64: str = Form(...),
     email_body: str = Form(...),
     subject: str = Form(...),
     success_receiver: str = Form(...),
     failed_receiver: str = Form(...),
-    user_id: str = Form(...)
+    access_token: str = Form(...)
 ):
     """
     Create a new operation associated with a user.
     """
     
-    
+    decode_token:dict=decode_access_token(access_token,JWT_SECRET_KEY,ALGORITHM)
+    if not decode_token["valid"]:
+        raise HTTPException(status_code=401, detail="Invalid access token")
+    user_id:str=decode_token["user_id"]
+    user:User|None=User.get_user_by_id(session,user_id)
+    if user is None:
+        raise HTTPException(status_code=401, detail="Invalid access token")
+    from_email:str=user.email
     try:
         # Create the operation
         operation = Operations.create_operation(
@@ -237,6 +276,42 @@ async def create_operation(
         raise UserExistException(detail="User does not exist with the provided user id")
     
 
+@api_router.get("/operations/{access_token}/{operation_id}")
+async def get_operation(access_token:str,operation_id: int):
+    """
+    Get an operation by operation ID.
+    """
+    decode_token:dict=decode_access_token(access_token,JWT_SECRET_KEY,ALGORITHM)
+    if not decode_token["valid"]:
+        raise HTTPException(status_code=401, detail="Invalid access token")
+    user_id:str=decode_token["user_id"]
+    user:User|None=User.get_user_by_id(session,user_id)
+    if user is None:
+        raise HTTPException(status_code=401, detail="Invalid access token")
+    try:
+        operation = Operations.get_operation(session, operation_id, user_id)
+    except ValueError as ve:
+        raise UserExistException(detail="User does not exist with the provided user id")
+    return {"data": operation}  
+
+
+@api_router.get("/operations/{access_token}")
+async def get_operation_user(access_token:str):
+    """
+    Get an operation by access_token(user ID).
+    """
+    decode_token:dict=decode_access_token(access_token,JWT_SECRET_KEY,ALGORITHM)
+    if not decode_token["valid"]:
+        raise HTTPException(status_code=401, detail="Invalid access token")
+    user_id:str=decode_token["user_id"]
+    user:User|None=User.get_user_by_id(session,user_id)
+    if user is None:
+        raise HTTPException(status_code=401, detail="Invalid access token")
+    try:
+        operations_info:list = Operations.get_operations_info(session, user_id)
+    except ValueError as ve:
+        raise UserExistException(detail="User does not exist with the provided user id")
+    return {"data":operations_info}
 
 # Include the API router in the main app
 app.include_router(api_router)

@@ -179,6 +179,7 @@ function main {
     }
 
     Write-Host "Application Communication Details:"
+    create-file-if-not-exists "env/communication.env"
     Write-Host
     while ($true) {
         $email_address = Read-Host "Enter the email address"
@@ -210,6 +211,7 @@ function main {
     update-env-variable "env/communication.env" "PASSWORD_EMAIL_PROJECT" "$password" $false
 
     Write-Host "Application Security Details:"
+    create-file-if-not-exists "env/secrets.env"
     Write-Host
     $FERNET_KEY = "Zsy6-8REWdN0-FkIhgBy8k19MJ7elYNAv3MxkWHFGOk="
     $ACCESS_TOKEN_EXPIRE_MINUTES = 60
@@ -233,6 +235,8 @@ function main {
     update-env-variable "env/secrets.env" "PDF_ENCRYPTION_SECRET" "${pdf_encryption_secret:-$PDF_ENCRYPTION_SECRET}" $true
 
     Write-Host "Unit Testing Details: "
+    create-file-if-not-exists "env/tests.env"
+
     Write-Host
     $EMAIL_SENDER_UNIT_TEST = "laamiri.ouail@etu.uae.ac.ma"
     $EMAIL_RECEIVER_UNIT_TEST = "laamiriouail@gmail.com"
@@ -276,9 +280,9 @@ function main {
         }
     }
 
-    update-env-variable "env/unit_test.env" "EMAIL_SENDER_UNIT_TEST" "$email_sender_unit_test" $true
-    update-env-variable "env/unit_test.env" "EMAIL_RECEIVER_UNIT_TEST" "$email_receiver_unit_test" $true
-    update-env-variable "env/unit_test.env" "PASSWORD_UNIT_TEST" "$password" $false
+    update-env-variable "env/tests.env" "EMAIL_SENDER_UNIT_TEST" "$email_sender_unit_test" $true
+    update-env-variable "env/tests.env" "EMAIL_RECEIVER_UNIT_TEST" "$email_receiver_unit_test" $true
+    update-env-variable "env/tests.env" "PASSWORD_UNIT_TEST" "$password" $false
 }
 
 # Execute the main function with command-line argument

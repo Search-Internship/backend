@@ -203,6 +203,8 @@ main() {
     fi
 
     echo "Application Communication Details:"
+    create_file_if_not_exists "env/communication.env"
+
     echo
     while true; do
         read -p "Enter the email address: " email_address
@@ -235,6 +237,8 @@ main() {
 
 
     echo "Application Security Details:"
+    create_file_if_not_exists "env/secrets.env"
+
     echo
     FERNET_KEY="Zsy6-8REWdN0-FkIhgBy8k19MJ7elYNAv3MxkWHFGOk="
     ACCESS_TOKEN_EXPIRE_MINUTES=60
@@ -258,6 +262,8 @@ main() {
     update_env_variable "env/secrets.env" "PDF_ENCRYPTION_SECRET" "${pdf_encryption_secret:-$PDF_ENCRYPTION_SECRET}" true
 
     echo "Unit Testing Details: "
+    create_file_if_not_exists "env/tests.env"
+
     echo
     EMAIL_SENDER_UNIT_TEST="laamiri.ouail@etu.uae.ac.ma"
     EMAIL_RECEIVER_UNIT_TEST="laamiriouail@gmail.com"
@@ -302,9 +308,9 @@ main() {
     done
     
 
-    update_env_variable "env/unit_test.env" "EMAIL_SENDER_UNIT_TEST" "$email_sender_unit_test" true
-    update_env_variable "env/unit_test.env" "EMAIL_RECEIVER_UNIT_TEST" "$email_receiver_unit_test" true
-    update_env_variable "env/unit_test.env" "PASSWORD_UNIT_TEST" "$password" false
+    update_env_variable "env/tests.env" "EMAIL_SENDER_UNIT_TEST" "$email_sender_unit_test" true
+    update_env_variable "env/tests.env" "EMAIL_RECEIVER_UNIT_TEST" "$email_receiver_unit_test" true
+    update_env_variable "env/tests.env" "PASSWORD_UNIT_TEST" "$password" false
 
     
 
