@@ -19,8 +19,8 @@ from utils.validity import (is_gmail_password_structure,is_valid_email,
                             is_valid_password,is_linkedin_profile_link)
 import shutil
 from pathlib import Path
-from models.user import User
-from models.operations import Operations
+
+from models import Operations,User
 from utils.jwt import (
                         create_access_token,decode_access_token
                       )
@@ -173,8 +173,7 @@ async def create_user(
     linkedin_link: str = Form(None),
     password: str = Form(...),
     phone_number: str = Form(...),
-    email_password: str = Form(None),
-    avatar: UploadFile = File(None)
+    email_password: str = Form(None)
 ):
     """
     Create a new user.
@@ -199,22 +198,14 @@ async def create_user(
         # Check if linkdin link has correct strutxtcture
         if not is_linkedin_profile_link(linkedin_link) and not linkedin_link=="":
             raise LinkException("Invalid linkdin link structure")
-        if avatar is not None:
-            avatar_base64:str=""
-        else:
-            temp_dir = str(Path("./temp"))
-            with open(f"{temp_dir}/avatar.png", "wb") as emails_file:
-                shutil.copyfileobj(avatar.file, emails_file)
-            avatar_base64:str=encrypt_image_to_base64(f"{temp_dir}/avatar.png")
-            os.remove(f"{temp_dir}/avatar.png")
+
         # Save user to database
-        is_created:bool=User.create_user(session,username, email, linkedin_link, password, phone_number, email_password,FERNET_KEY,avatar_base64)
+        is_created:bool=User.create_user(session,username, email, linkedin_link, password, phone_number, email_password,FERNET_KEY)
         if not is_created:
             raise UserExistException(f"User already exist with this email {email}")
         
         # Send confirmation email
         # send_email_smtp(email, "User Created", "Your account has been successfully created.")
-
         return {"message": "User created successfully"}
     except (EmailException, PasswordException, EmailConnectionFailedException) as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
@@ -240,7 +231,6 @@ async def login(
 
 @api_router.post("/operations/")
 async def create_operation(
-    pdf_base64: str = Form(...),
     email_body: str = Form(...),
     subject: str = Form(...),
     success_receiver: str = Form(...),
@@ -264,7 +254,6 @@ async def create_operation(
         operation = Operations.create_operation(
             session,
             from_email=from_email,
-            pdf_base64=pdf_base64,
             email_body=email_body,
             subject=subject,
             success_receiver=success_receiver,
@@ -276,11 +265,12 @@ async def create_operation(
         raise UserExistException(detail="User does not exist with the provided user id")
     
 
-@api_router.get("/operations/{access_token}/{operation_id}")
-async def get_operation(access_token:str,operation_id: int):
+@api_router.get("/operations/{access_token}/{operation_id}/")
+async def get_operation(access_token:str,operation_id: str):
     """
     Get an operation by operation ID.
     """
+    print("/operations/{access_token}/{operation_id}/")
     decode_token:dict=decode_access_token(access_token,JWT_SECRET_KEY,ALGORITHM)
     if not decode_token["valid"]:
         raise HTTPException(status_code=401, detail="Invalid access token")
@@ -289,17 +279,18 @@ async def get_operation(access_token:str,operation_id: int):
     if user is None:
         raise HTTPException(status_code=401, detail="Invalid access token")
     try:
-        operation = Operations.get_operation(session, operation_id, user_id)
+        operation = Operations.get_operation_by_id(session, operation_id, user_id)
     except ValueError as ve:
         raise UserExistException(detail="User does not exist with the provided user id")
     return {"data": operation}  
 
 
-@api_router.get("/operations/{access_token}")
+@api_router.get("/operations/{access_token}/")
 async def get_operation_user(access_token:str):
     """
     Get an operation by access_token(user ID).
     """
+    print("/operations/{access_token}/")
     decode_token:dict=decode_access_token(access_token,JWT_SECRET_KEY,ALGORITHM)
     if not decode_token["valid"]:
         raise HTTPException(status_code=401, detail="Invalid access token")

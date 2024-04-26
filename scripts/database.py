@@ -54,23 +54,66 @@ except:
 
 
 if is_connect:
-    # SQL query to create the users table
-    create_table_query = """
-    CREATE TABLE IF NOT EXISTS users (
-        id VARCHAR(255) PRIMARY KEY,
-        username VARCHAR(255),
-        email VARCHAR(255),
-        linkedin_link VARCHAR(255),
-        password_hash VARCHAR(255),
-        phone_number VARCHAR(255) UNIQUE,
-        email_password VARCHAR(255)
-    )
-    """
+    try:
+        # SQL query to create the users table
+        create_table_query = """
+        CREATE TABLE IF NOT EXISTS users (
+            id VARCHAR(255) PRIMARY KEY,
+            username VARCHAR(255),
+            date VARCHAR(255),
+            time VARCHAR(255),
+            email VARCHAR(255) UNIQUE,
+            linkedin_link VARCHAR(255),
+            password_hash VARCHAR(255),
+            phone_number VARCHAR(255),
+            email_password VARCHAR(255)
+        )
+        """
 
-    # Execute the SQL query
-    cursor.execute(create_table_query)
+        # Execute the SQL query
+        cursor.execute(create_table_query)
 
-    # Commit the transaction and close the connection
-    connection.commit()
-    connection.close()
-    print("Table Users Created !")
+        # Commit the transaction and close the connection
+        connection.commit()
+        print("Table Users Created !")
+    except Exception as e:
+        print(f"Error creating users table: {e}")
+
+    try:
+        # SQL query to create the operations table
+        create_operations_table_query = """
+        CREATE TABLE IF NOT EXISTS operations (
+            id VARCHAR(255) PRIMARY KEY,
+            from_email VARCHAR(255),
+            date VARCHAR(255),
+            time VARCHAR(255),
+            email_body TEXT,
+            subject TEXT,
+            success_receiver VARCHAR(255),
+            failed_receiver VARCHAR(255),
+            user_id VARCHAR(255),
+            FOREIGN KEY (user_id) REFERENCES users(id)
+        )
+        """
+
+        # Execute the SQL query to create operations table
+        cursor.execute(create_operations_table_query)
+
+        # Commit the transaction and close the connection
+        connection.commit()
+        connection.close()
+        print("Table Operations Created !")
+    except Exception as e:
+        print(f"Error creating operations table: {e}")
+
+
+
+
+connection.close()
+
+
+
+
+
+
+

@@ -15,7 +15,7 @@ def create_access_token(user_id: str,access_token_expire_minutes:str,jwt_secret_
 def decode_access_token(token: str,jwt_secret_key:str,algorithm:str) -> dict:
     try:
         # Decode the token
-        payload = jwt.decode(token, jwt, algorithms=[algorithm])
+        payload = jwt.decode(token, jwt_secret_key, algorithms=[algorithm])
         
         # Convert expiration time from seconds since epoch to datetime object
         expiration_time = datetime.fromtimestamp(payload["exp"], timezone.utc)
@@ -28,9 +28,7 @@ def decode_access_token(token: str,jwt_secret_key:str,algorithm:str) -> dict:
         # Token is valid and not expired
         user_id = payload.get("sub")
         return {"valid": True, "user_id": user_id}
-    except jwt.ExpiredSignatureError:
+    except:
         # Token has expired
         return {"valid": False, "user_id": None}
-    except jwt.InvalidTokenError:
-        # Token is invalid
-        return {"valid": False, "user_id": None}
+    

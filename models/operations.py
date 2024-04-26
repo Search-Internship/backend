@@ -1,12 +1,11 @@
 import uuid
-from sqlalchemy import Column, String, ForeignKey
+from sqlalchemy import Column, String, ForeignKey,Text
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declarative_base
 import os
 import sys
 parent_dir = os.path.abspath(os.path.join(os.getcwd(), '.'))
 sys.path.append(parent_dir)
-from models.user import User
 import datetime
 
 Base = declarative_base()
@@ -30,14 +29,14 @@ class Operations(Base):
     __tablename__ = 'operations'
 
     id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
-    from_email = Column(String)
-    date = Column(String)
-    time = Column(String)
-    resume_base64 = Column(String)
-    email_body = Column(String)
-    subject = Column(String)
-    success_receiver = Column(String)
-    failed_receiver = Column(String)
+    from_email = Column(String,max_length=255)
+    date = Column(String,max_length=255)
+    time = Column(String,max_length=255)
+    resume_base64 = Column(Text)
+    email_body = Column(String,max_length=255)
+    subject = Column(String,max_length=255)
+    success_receiver = Column(Text)
+    failed_receiver = Column(Text)
     user_id = Column(String, ForeignKey('users.id'))
 
     # Define the relationship to the Users table
@@ -64,6 +63,7 @@ class Operations(Base):
         Raises:
             ValueError: If the user with the provided user_id does not exist.
         """
+        from models.user import User
         # Check if the user exists
         user = session.query(User).filter_by(id=user_id).first()
         if not user:
@@ -101,6 +101,7 @@ class Operations(Base):
         Raises:
             ValueError: If the user with the provided user_id does not exist.
         """
+        from models.user import User
         # Check if the user exists
         user:User|None = session.query(User).filter_by(id=user_id).first()
         if not user:
@@ -136,6 +137,7 @@ class Operations(Base):
         Raises:
             ValueError: If the user with the provided user_id does not exist.
         """
+        from models.user import User
         # Check if the user exists
         user = session.query(User).filter_by(id=user_id).first()
         if not user:
