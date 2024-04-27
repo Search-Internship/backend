@@ -1,22 +1,21 @@
 ## Description
 
 ema-backend is a API for the search internship project.
-## Installation :
-### Development :
+
+## Setup Project :
+
+### Linux & Mac :
 ```bash
-# install requirements
-$ pip install -r requirements/base.txt 
+$ chmod +x ./scripts/setup.sh
+$ ./scripts/setup.sh
 ```
-### Test :
-```bash
-# install requirements
-$ pip install -r requirements/test.txt 
+### Windows :
+```powershell
+$ .\scripts\setup.ps1
 ```
-### Production :
-```bash
-# install requirements
-$ pip install -r requirements/prod.txt 
-```
+
+
+
 
 ## Envirenment Variable :
 ### 1. `env/database.env` :
@@ -58,11 +57,11 @@ $ pip install -r requirements/prod.txt
 
 #### JWT_SECRET_KEY
 - **Description**: The secret key used for JWT token encoding and decoding.
-- **Example**: `SECRET_KEY="abababababababbabhha"`
+- **Example**: `JWT_SECRET_KEY="abababababababbabhha"`
 
 #### PDF_ENCRYPTION_SECRET
 - **Description**: The secret key used for PDF encryption and decryption.
-- **Example**: `SECRET_KEY="abababababababbabhha"`
+- **Example**: `PDF_ENCRYPTION_SECRET="abababababababbabhha"`
 
 ### 3. `env/tests.env` :
 #### EMAIL_SENDER_UNIT_TEST
@@ -111,12 +110,91 @@ $ docker pull ouail02/ema-back:tagname
 $ docker run -p you_port:5000 ema-back:tagname
 ```
 
-## API Endpoints Documentation
 
-### `/api/`
 
-#### `GET /`
-- **Description**: Endpoint to check if the API is running properly.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## Database Tables :
+
+### Users : 
+
+| Attribute       | Description                                         |
+|-----------------|-----------------------------------------------------|
+| id              | Unique identifier for the user.                    |
+| username        | User's username.                                    |
+| email           | User's email address (unique).                      |
+| linkedin_link   | User's LinkedIn profile link.                       |
+| password_hash   | Hashed password for user authentication.            |
+| phone_number    | User's phone number.                                |
+| date            | Date of the operation.                              |
+| time            | Time of the operation.                              |
+| email_password  | Encrypted email password.                           |
+
+---
+
+### Operations : 
+
+| Attribute         | Description                                                    |
+|-------------------|----------------------------------------------------------------|
+| id                | Unique identifier for the operation.                          |
+| from_email        | Source email address.                                         |
+| date              | Date of the operation.                                        |
+| time              | Time of the operation.                                        |
+| email_body        | Body of the email.                                            |
+| subject           | Subject of the email.                                         |
+| success_receiver  | Receiver of the successful operation.                         |
+| failed_receiver   | Receiver of the failed operation.                             |
+| user_id           | Foreign key referencing the id of the user associated.        |
+
+
+## API Endpoints
+
+### Index Endpoint
+
+- **URL**: `GET /api/`
+- **Description**: Check if the server is running.
 - **Response**:
   - **Status Code**: 200 OK
   - **Response Body**:
@@ -126,55 +204,35 @@ $ docker run -p you_port:5000 ema-back:tagname
     }
     ```
 
-### `/api/email/send-internship`
+### Sending Internship Emails
 
-#### `POST /email/send-internship`
-- **Description**: Endpoint to send internship emails.
+- **URL**: `POST /api/email/send-internship`
+- **Description**: Send internship emails with attachments.
 - **Request Body**:
-  - `emails` (file): A text file containing email addresses.
-  - `email_body` (string): The body of the email to be sent.
-  - `resume` (file): The resume file to be attached.
-  - `sender_email` (string): The sender's email address.
-  - `sender_password` (string): The sender's email password.
-  - `email_subject` (string): The subject of the email.
-  - `file_separator` (string): The separator used in the emails file.
+  - `access_token` (string): User access token.
+  - `emails` (file): Text file containing email addresses.
+  - `email_body` (string): Body of the email to be sent.
+  - `resume` (file): Resume file to be attached.
+  - `email_subject` (string): Subject of the email.
+  - `file_separator` (string): Separator used in the emails file.
 - **Response**:
   - **Status Code**: 200 OK
   - **Response Body**:
     ```json
     {
         "success_receiver": ["email1@example.com", "email2@example.com"],
-        "failed_receiver": ["email3@example.com"]
+        "failed_receiver": ["email3@example.com"],
+        "saved": true
     }
     ```
-- **Possible Errors**:
-  - 400 Bad Request:
-    - If the emails file is missing.
-    - If the resume file is missing.
-    - If the emails file is not a TXT file.
-    - If the resume file is not a PDF file.
-    - If the password form is incorrect.
-    - If the email form is incorrect.
-  - 503 Service Unavailable:
-    - If failed to connect to the sender's email account.
-- **Field Formats**:
-  - `emails` (file): A text file containing email addresses separated by the specified separator.
-  - `email_body` (string): Html string.
-  - `resume` (file): A PDF file.
-  - `sender_email` (string): A valid email address.
-  - `sender_password` (string): A password following a specific format (four segments separated by spaces, each segment exactly four characters long).
-  - `email_subject` (string): Any string.
-  - `file_separator` (string): Any string used to separate email addresses in the emails file.
 
+### Sending Verification Code
 
-
-### `/api/email/send-verification-code`
-
-#### `POST /email/send-verification-code`
-- **Description**: Endpoint to send a verification code to the provided email address.
+- **URL**: `POST /api/email/send-verification-code`
+- **Description**: Send a verification code to the provided email address.
 - **Request Body**:
-  - `to` (string): The recipient email address.
-  - `language` (string, optional): The language of the email content (default: "fr").
+  - `to` (string): Recipient email address.
+  - `language` (string, optional): Language of the email content (default: "fr").
 - **Response**:
   - **Status Code**: 200 OK
   - **Response Body**:
@@ -183,28 +241,18 @@ $ docker run -p you_port:5000 ema-back:tagname
         "code": "verification-code"
     }
     ```
-- **Possible Errors**:
-  - 400 Bad Request:
-    - If the email form is incorrect.
-  - 503 Service Unavailable:
-    - If failed to connect to the sender's email account.
-- **Field Formats**:
-  - `to` (string): A valid email address.
-  - `language` (string): Any string indicating the language of the email content.
 
+### User Management
 
-
-### `/api/users/`
-
-#### `POST /users/`
-- **Description**: Endpoint to create a new user.
+- **URL**: `POST /api/users/`
+- **Description**: Create a new user.
 - **Request Body**:
-  - `username` (string): The username of the new user.
-  - `email` (string): The email address of the new user.
-  - `linkedin_link` (string, optional): The LinkedIn profile link of the new user.
-  - `password` (string): The password of the new user.
-  - `phone_number` (string): The phone number of the new user.
-  - `email_password` (string): The password for the user's email account.
+  - `username` (string): User's username.
+  - `email` (string): User's email address.
+  - `linkedin_link` (string, optional): User's LinkedIn profile link.
+  - `password` (string): User's password.
+  - `phone_number` (string): User's phone number.
+  - `email_password` (string, optional): Password for user's email account.
 - **Response**:
   - **Status Code**: 200 OK
   - **Response Body**:
@@ -213,29 +261,16 @@ $ docker run -p you_port:5000 ema-back:tagname
         "message": "User created successfully"
     }
     ```
-- **Possible Errors**:
-  - 400 Bad Request:
-    - If the email is invalid.
-    - If the email password structure is invalid.
-    - If the password structure is invalid.
-    - If the LinkedIn profile link structure is invalid.
-- **Field Formats**:
-  - `username` (string): Any string.
-  - `email` (string): A valid email address.
-  - `linkedin_link` (string, optional): A LinkedIn profile link or an empty string.
-  - `password` (string): A password following a specific format (contains at least one lowercase character, one uppercase character, one digit, and has a minimum length of 8 characters).
-  - `phone_number` (string): Any string.
-  - `email_password` (string, optional): A password following a specific format (four segments separated by spaces, each segment exactly four characters long), or an empty string.
 
-### `/api/users/login`
+### User Login
 
-#### `POST /`
-- **Description**: Endpoint to authenticate a user and generate an access token.
-- **Parameters**:
-  - `email` (required): The email of the user.
-  - `password` (required): The password of the user.
+- **URL**: `POST /api/users/login`
+- **Description**: Authenticate a user and generate an access token.
+- **Request Body**:
+  - `email` (string): User's email address.
+  - `password` (string): User's password.
 - **Response**:
-  - **Status Code**: 
+  - **Status Code**:
     - 200 OK: Successful authentication.
     - 401 Unauthorized: Invalid credentials.
   - **Response Body** (for 200 OK):
@@ -246,8 +281,81 @@ $ docker run -p you_port:5000 ema-back:tagname
     }
     ```
 
+### Create Operation
+
+- **URL**: `POST /api/operations/`
+- **Description**: Create a new operation associated with a user.
+- **Request Body**:
+  - `email_body` (string): Body of the email.
+  - `subject` (string): Subject of the email.
+  - `success_receiver` (string): Comma-separated list of successful recipients' email addresses.
+  - `failed_receiver` (string): Comma-separated list of failed recipients' email addresses.
+  - `access_token` (string): User access token.
+- **Response**:
+  - **Status Code**: 200 OK
+  - **Response Body**:
+    ```json
+    {
+        "message": "Operation created successfully"
+    }
+    ```
+
+### Get Operation by ID
+
+- **URL**: `GET /api/operations/{access_token}/{operation_id}/`
+- **Description**: Get an operation by its ID.
+- **Response**:
+  - **Status Code**: 200 OK
+  - **Response Body**: Operation details.
+
+### Get Operation by User ID
+
+- **URL**: `GET /api/operations/{access_token}/`
+- **Description**: Get all operations associated with a user.
+- **Response**:
+  - **Status Code**: 200 OK
+  - **Response Body**: List of operations.
 
   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ## Project Structure :
 This project's directory structure is inspired by the article "[Structuring a FastAPI App: An In-Depth Guide](https://medium.com/@ketansomvanshi007/structuring-a-fastapi-app-an-in-depth-guide-cdec3b8f4710)" on Medium.

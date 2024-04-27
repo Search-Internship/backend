@@ -127,20 +127,24 @@ is_valid_email() {
 
 # Main function
 main() {
-    db_type=${1,,}
-    if [[ ! " mysql mariadb postgresql oracle oracledb mssql sqlserver sqlite" =~ " $db_type " ]]; then
-        echo "Usage: $0 db_type"
-        echo "And db_type in ['mysql', 'mariadb', 'postgresql', 'oracle', 'oracledb', 'mssql', 'sqlserver', 'sqlite']"
+    DB_TYPE="sqlite"
+    echo
+    echo "Available database type : mysql , mariadb, postgresql, oracle, oracledb, mssql, sqlserver, sqlite"
+    read -p "Enter the database type (default is $DB_TYPE): " db_type
+
+    if [[ ! " mysql mariadb postgresql oracle oracledb mssql sqlserver sqlite" =~ " ${db_type:-$DB_TYPE} " ]]; then
+        echo "$db_type not in ['mysql', 'mariadb', 'postgresql', 'oracle', 'oracledb', 'mssql', 'sqlserver', 'sqlite']"
         exit 1
     fi
 
     if [ -z "$db_type" ]; then
-        db_type="sqlite"
+        db_type="$DB_TYPE"
     fi
 
-    venv_name="venv"
-
-    create_and_activate_venv "$venv_name"
+    VENV_NAME="venv"
+    echo
+    read -p "Enter the virtual envirenment name (default is $VENV_NAME): " venv_name
+    create_and_activate_venv "${venv_name:-$VENV_NAME}"
 
     available_db=( ["mysql"]="mysql-connector-python" ["postgresql"]="psycopg2" ["oracle"]="cx_Oracle" ["oracledb"]="cx_Oracle" ["mssql"]="pymssql" ["sqlserver"]="pymssql" ["sqlite"]="")
 
