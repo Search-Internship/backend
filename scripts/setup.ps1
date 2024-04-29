@@ -43,7 +43,7 @@ function update_env_variable {
     if ($print_value) {
         Write-Host "Variable '$variable_name' set to '$value' in '$file_path' file."
     } else {
-        Write-Host "Variable '$variable_name' set to '****' in '$file_path' file."
+        Write-Host "Variable '$variable_name' set to '**' in '$file_path' file."
     }
 }
 
@@ -112,12 +112,12 @@ function main {
         $db_type = $DB_TYPE
     }
 
-    $VENV_NAME = "venv"
     Write-Host
-    $venv_name = Read-Host "Enter the virtual environment name (default is $VENV_NAME): "
+    $venv_name = Read-Host "Enter the virtual environment name (default is venv): "
     # Check if $venv_name is empty, if so, set it to the default value
+
     if ([string]::IsNullOrEmpty($venv_name)) {
-        $venv_name = $VENV_NAME
+        $venv_name = "venv"
     }
 
     create_and_activate_venv $venv_name
@@ -151,34 +151,54 @@ function main {
         $default_password = ""
         Write-Host "Enter the database ($db_type) details:"
         Write-Host
-        $db_name = Read-Host "Enter the database name (default is $default_db_name): "
+        $db_name = Read-Host "Enter the database name (default is easyinternship): "
         Write-Host
-        $db_host = Read-Host "Enter the host (default is $default_host): "
+        $db_host = Read-Host "Enter the host (default is localhost): "
         Write-Host
-        $user_name = Read-Host "Enter the username (default is $default_user_name): "
+        $user_name = Read-Host "Enter the username (default is root): "
         Write-Host
         $password = read_password
-
-        update_env_variable "env/database.env" "DB_NAME" ($db_name -or $default_db_name) 1
-        update_env_variable "env/database.env" "HOST" ($db_host -or $default_host) 1
-        update_env_variable "env/database.env" "DB_TYPE" ($db_type -or $default_db_type) 1
-        update_env_variable "env/database.env" "USER_NAME" ($user_name -or $default_user_name) 1
-        update_env_variable "env/database.env" "PASSWORD" ($password -or $default_password) 1
+        if ([string]::IsNullOrEmpty($db_name)) {
+            $db_name = "easyinternship"
+        }
+        if ([string]::IsNullOrEmpty($db_host)) {
+            $db_host = "localhost"
+        }
+        if ([string]::IsNullOrEmpty($user_name)) {
+            $user_name = "root"
+        }
+        update_env_variable "env/database.env" "DB_NAME" $db_name 1
+        update_env_variable "env/database.env" "HOST" $db_host 1
+        update_env_variable "env/database.env" "DB_TYPE" $db_type 1
+        update_env_variable "env/database.env" "USER_NAME" $user_name 1
+        update_env_variable "env/database.env" "PASSWORD" $password 0
     }
 
     if ($db_type -eq "mysql" -or $db_type -eq "mariadb") {
         $port = Read-Host "Enter the port (default is 3306): "
-        update_env_variable "env/database.env" "PORT" ($port -or 3306) 1
+        if ([string]::IsNullOrEmpty($port)) {
+            $port = 3306
+        }
+        update_env_variable "env/database.env" "PORT" $port 1
         Write-Host
     } elseif ($db_type -eq "oracle" -or $db_type -eq "oracledb") {
         $port = Read-Host "Enter the port (default is 1521): "
-        update_env_variable "env/database.env" "PORT" ($port -or 1521) 1
+        if ([string]::IsNullOrEmpty($port)) {
+            $port = 1521
+        }
+        update_env_variable "env/database.env" "PORT" $port 1
     } elseif ($db_type -eq "mssql" -or $db_type -eq "sqlserver") {
         $port = Read-Host "Enter the port (default is 1433): "
-        update_env_variable "env/database.env" "PORT" ($port -or 1433) 1
+        if ([string]::IsNullOrEmpty($port)) {
+            $port = 1433
+        }
+        update_env_variable "env/database.env" "PORT" $port 1
     } elseif ($db_type -eq "postgresql") {
         $port = Read-Host "Enter the port (default is 5432): "
-        update_env_variable "env/database.env" "PORT" ($port -or 5432) 1
+        if ([string]::IsNullOrEmpty($port)) {
+            $port = 5432
+        }
+        update_env_variable "env/database.env" "PORT" $port 1
     } elseif ($db_type -eq "sqlite") {
         $db_file_path = Read-Host "Enter the database file path: "
         update_env_variable "env/database.env" "DB_FILE_PATH" $db_file_path 1
@@ -220,34 +240,41 @@ function main {
     create_file_if_not_exists "env/secrets.env"
 
     Write-Host
-    $FERNET_KEY = "Zsy6-8REWdN0-FkIhgBy8k19MJ7elYNAv3MxkWHFGOk="
-    $ACCESS_TOKEN_EXPIRE_MINUTES = 60
-    $JWT_SECRET_KEY = "abababababababbabhha"
-    $ALGORITHM = "HS256"
-    $PDF_ENCRYPTION_SECRET = "pdfababababab"
-    $fernet_key = Read-Host "FERNET KEY (default is $FERNET_KEY): "
+    $fernet_key = Read-Host "FERNET KEY (default is Zsy6-8REWdN0-FkIhgBy8k19MJ7elYNAv3MxkWHFGOk=): "
     Write-Host
-    $access_token_expire_minutes = Read-Host "JWT ACCESS TOKEN EXPIRE MINUTES (default is $ACCESS_TOKEN_EXPIRE_MINUTES): "
+    $access_token_expire_minutes = Read-Host "JWT ACCESS TOKEN EXPIRE MINUTES (default is 60): "
     Write-Host
-    $jwt_secret_key = Read-Host "JWT KEY (default is $JWT_SECRET_KEY): "
+    $jwt_secret_key = Read-Host "JWT KEY (default is abababababababbabhha): "
     Write-Host
-    $algorithm = Read-Host "JWT ALGORITHM (default is $ALGORITHM): "
+    $algorithm = Read-Host "JWT ALGORITHM (default is HS256): "
     Write-Host
-    $pdf_encryption_secret = Read-Host "PDF ENCRYPTION SECRET (default is $PDF_ENCRYPTION_SECRET): "
+    $pdf_encryption_secret = Read-Host "PDF ENCRYPTION SECRET (default is pdfababababab): "
     Write-Host
-    update_env_variable "env/secrets.env" "FERNET_KEY" ($fernet_key -or $FERNET_KEY) 1
-    update_env_variable "env/secrets.env" "ACCESS_TOKEN_EXPIRE_MINUTES" ($access_token_expire_minutes -or $ACCESS_TOKEN_EXPIRE_MINUTES) 1
-    update_env_variable "env/secrets.env" "JWT_SECRET_KEY" ($jwt_secret_key -or $JWT_SECRET_KEY) 1
-    update_env_variable "env/secrets.env" "ALGORITHM" ($algorithm -or $ALGORITHM) 1
-    update_env_variable "env/secrets.env" "PDF_ENCRYPTION_SECRET" ($pdf_encryption_secret -or $PDF_ENCRYPTION_SECRET) 1
+    if ([string]::IsNullOrEmpty($fernet_key)) {
+        $fernet_key = "Zsy6-8REWdN0-FkIhgBy8k19MJ7elYNAv3MxkWHFGOk="
+    }
+    if ([string]::IsNullOrEmpty($access_token_expire_minutes)) {
+        $access_token_expire_minutes = "60"
+    }
+    if ([string]::IsNullOrEmpty($jwt_secret_key)) {
+        $jwt_secret_key = "abababababababbabhha"
+    }
+    if ([string]::IsNullOrEmpty($algorithm)) {
+        $algorithm = "HS256"
+    }
+    if ([string]::IsNullOrEmpty($pdf_encryption_secret)) {
+        $pdf_encryption_secret = "pdfababababab"
+    }
+    update_env_variable "env/secrets.env" "FERNET_KEY" $fernet_key 1
+    update_env_variable "env/secrets.env" "ACCESS_TOKEN_EXPIRE_MINUTES" $access_token_expire_minutes 1
+    update_env_variable "env/secrets.env" "JWT_SECRET_KEY" $jwt_secret_key 1
+    update_env_variable "env/secrets.env" "ALGORITHM" $algorithm 1
+    update_env_variable "env/secrets.env" "PDF_ENCRYPTION_SECRET" $pdf_encryption_secret 1
 
     Write-Host "Unit Testing Details: "
     create_file_if_not_exists "env/tests.env"
 
     Write-Host
-    $EMAIL_SENDER_UNIT_TEST = "laamiri.ouail@etu.uae.ac.ma"
-    $EMAIL_RECEIVER_UNIT_TEST = "laamiriouail@gmail.com"
-    $PASSWORD_UNIT_TEST = "cfkd dihq xxyw ugin "
     while (1) {
         $email_sender_unit_test = Read-Host "Enter the email sender for unit test : "
 
