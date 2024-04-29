@@ -11,6 +11,7 @@ $ ./scripts/setup.sh
 ```
 ### Windows :
 ```powershell
+$ Set-ExecutionPolicy Unrestricted -Scope CurrentUser -Force
 $ .\scripts\setup.ps1
 ```
 
