@@ -64,7 +64,7 @@ function create_and_activate_venv {
     param(
         [string]$venv_name
     )
-    $python_cmd = "python3"
+    $python_cmd = "python"
     $create_cmd = "$python_cmd -m venv $venv_name"
     $activate_cmd = "$venv_name\Scripts\Activate"
 
