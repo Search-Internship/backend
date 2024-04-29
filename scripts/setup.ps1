@@ -115,7 +115,12 @@ function main {
     $VENV_NAME = "venv"
     Write-Host
     $venv_name = Read-Host "Enter the virtual environment name (default is $VENV_NAME): "
-    create_and_activate_venv ($venv_name -or $VENV_NAME)
+    # Check if $venv_name is empty, if so, set it to the default value
+    if ([string]::IsNullOrEmpty($venv_name)) {
+        $venv_name = $VENV_NAME
+    }
+
+    create_and_activate_venv $venv_name
 
     $available_db = @{
         "mysql" = "mysql-connector-python"
@@ -148,14 +153,14 @@ function main {
         Write-Host
         $db_name = Read-Host "Enter the database name (default is $default_db_name): "
         Write-Host
-        $host = Read-Host "Enter the host (default is $default_host): "
+        $db_host = Read-Host "Enter the host (default is $default_host): "
         Write-Host
         $user_name = Read-Host "Enter the username (default is $default_user_name): "
         Write-Host
         $password = read_password
 
         update_env_variable "env/database.env" "DB_NAME" ($db_name -or $default_db_name) 1
-        update_env_variable "env/database.env" "HOST" ($host -or $default_host) 1
+        update_env_variable "env/database.env" "HOST" ($db_host -or $default_host) 1
         update_env_variable "env/database.env" "DB_TYPE" ($db_type -or $default_db_type) 1
         update_env_variable "env/database.env" "USER_NAME" ($user_name -or $default_user_name) 1
         update_env_variable "env/database.env" "PASSWORD" ($password -or $default_password) 1
