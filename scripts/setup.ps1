@@ -131,7 +131,7 @@ function main {
     Write-Output "Available database type : mysql , mariadb, postgresql, oracle, oracledb, mssql, sqlserver, sqlite"
     $db_type = Read-Host "Enter the database type (default is $DB_TYPE)"
     
-    if (-not (" mysql mariadb postgresql oracle oracledb mssql sqlserver sqlite" -contains " $db_type")) {
+    if (-not (" mysql mariadb postgresql oracle oracledb mssql sqlserver sqlite" -contains "$db_type")) {
         Write-Output "$db_type not in ['mysql', 'mariadb', 'postgresql', 'oracle', 'oracledb', 'mssql', 'sqlserver', 'sqlite']"
         exit 1
     }
@@ -146,6 +146,7 @@ function main {
 
     $available_db = @{
         "mysql" = "mysql-connector-python"
+        "mariadb" = "mysql-connector-python"
         "postgresql" = "psycopg2"
         "oracle" = "cx_Oracle"
         "oracledb" = "cx_Oracle"
