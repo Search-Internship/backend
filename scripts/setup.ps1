@@ -154,36 +154,36 @@ function main {
         Write-Host
         $password = read_password
 
-        update_env_variable "env/database.env" "DB_NAME" ($db_name -or $default_db_name) $true
-        update_env_variable "env/database.env" "HOST" ($host -or $default_host) $true
-        update_env_variable "env/database.env" "DB_TYPE" ($db_type -or $default_db_type) $true
-        update_env_variable "env/database.env" "USER_NAME" ($user_name -or $default_user_name) $true
-        update_env_variable "env/database.env" "PASSWORD" ($password -or $default_password) $false
+        update_env_variable "env/database.env" "DB_NAME" ($db_name -or $default_db_name) 1
+        update_env_variable "env/database.env" "HOST" ($host -or $default_host) 1
+        update_env_variable "env/database.env" "DB_TYPE" ($db_type -or $default_db_type) 1
+        update_env_variable "env/database.env" "USER_NAME" ($user_name -or $default_user_name) 1
+        update_env_variable "env/database.env" "PASSWORD" ($password -or $default_password) 1
     }
 
     if ($db_type -eq "mysql" -or $db_type -eq "mariadb") {
         $port = Read-Host "Enter the port (default is 3306): "
-        update_env_variable "env/database.env" "PORT" ($port -or 3306) $true
+        update_env_variable "env/database.env" "PORT" ($port -or 3306) 1
         Write-Host
     } elseif ($db_type -eq "oracle" -or $db_type -eq "oracledb") {
         $port = Read-Host "Enter the port (default is 1521): "
-        update_env_variable "env/database.env" "PORT" ($port -or 1521) $true
+        update_env_variable "env/database.env" "PORT" ($port -or 1521) 1
     } elseif ($db_type -eq "mssql" -or $db_type -eq "sqlserver") {
         $port = Read-Host "Enter the port (default is 1433): "
-        update_env_variable "env/database.env" "PORT" ($port -or 1433) $true
+        update_env_variable "env/database.env" "PORT" ($port -or 1433) 1
     } elseif ($db_type -eq "postgresql") {
         $port = Read-Host "Enter the port (default is 5432): "
-        update_env_variable "env/database.env" "PORT" ($port -or 5432) $true
+        update_env_variable "env/database.env" "PORT" ($port -or 5432) 1
     } elseif ($db_type -eq "sqlite") {
         $db_file_path = Read-Host "Enter the database file path: "
-        update_env_variable "env/database.env" "DB_FILE_PATH" $db_file_path $true
+        update_env_variable "env/database.env" "DB_FILE_PATH" $db_file_path 1
     }
 
     Write-Host "Application Communication Details:"
     create_file_if_not_exists "env/communication.env"
 
     Write-Host
-    while ($true) {
+    while (1) {
         $email_address = Read-Host "Enter the email address: "
 
         # Check if the email address is valid
@@ -197,7 +197,7 @@ function main {
 
     # Loop until a valid email password is entered
     Write-Host
-    while ($true) {
+    while (1) {
         $password = read_password
 
         # Call your function to validate email password structure
@@ -208,8 +208,8 @@ function main {
         }
     }
 
-    update_env_variable "env/communication.env" "EMAIL_PROJECT" $email_address $true
-    update_env_variable "env/communication.env" "PASSWORD_EMAIL_PROJECT" $password $false
+    update_env_variable "env/communication.env" "EMAIL_PROJECT" $email_address 1
+    update_env_variable "env/communication.env" "PASSWORD_EMAIL_PROJECT" $password 0
 
     Write-Host "Application Security Details:"
     create_file_if_not_exists "env/secrets.env"
@@ -230,11 +230,11 @@ function main {
     Write-Host
     $pdf_encryption_secret = Read-Host "PDF ENCRYPTION SECRET (default is $PDF_ENCRYPTION_SECRET): "
     Write-Host
-    update_env_variable "env/secrets.env" "FERNET_KEY" ($fernet_key -or $FERNET_KEY) $true
-    update_env_variable "env/secrets.env" "ACCESS_TOKEN_EXPIRE_MINUTES" ($access_token_expire_minutes -or $ACCESS_TOKEN_EXPIRE_MINUTES) $true
-    update_env_variable "env/secrets.env" "JWT_SECRET_KEY" ($jwt_secret_key -or $JWT_SECRET_KEY) $true
-    update_env_variable "env/secrets.env" "ALGORITHM" ($algorithm -or $ALGORITHM) $true
-    update_env_variable "env/secrets.env" "PDF_ENCRYPTION_SECRET" ($pdf_encryption_secret -or $PDF_ENCRYPTION_SECRET) $true
+    update_env_variable "env/secrets.env" "FERNET_KEY" ($fernet_key -or $FERNET_KEY) 1
+    update_env_variable "env/secrets.env" "ACCESS_TOKEN_EXPIRE_MINUTES" ($access_token_expire_minutes -or $ACCESS_TOKEN_EXPIRE_MINUTES) 1
+    update_env_variable "env/secrets.env" "JWT_SECRET_KEY" ($jwt_secret_key -or $JWT_SECRET_KEY) 1
+    update_env_variable "env/secrets.env" "ALGORITHM" ($algorithm -or $ALGORITHM) 1
+    update_env_variable "env/secrets.env" "PDF_ENCRYPTION_SECRET" ($pdf_encryption_secret -or $PDF_ENCRYPTION_SECRET) 1
 
     Write-Host "Unit Testing Details: "
     create_file_if_not_exists "env/tests.env"
@@ -243,7 +243,7 @@ function main {
     $EMAIL_SENDER_UNIT_TEST = "laamiri.ouail@etu.uae.ac.ma"
     $EMAIL_RECEIVER_UNIT_TEST = "laamiriouail@gmail.com"
     $PASSWORD_UNIT_TEST = "cfkd dihq xxyw ugin "
-    while ($true) {
+    while (1) {
         $email_sender_unit_test = Read-Host "Enter the email sender for unit test : "
 
         # Check if the email address is valid
@@ -256,7 +256,7 @@ function main {
     }
 
     Write-Host
-    while ($true) {
+    while (1) {
         $password = read_password
 
         # Call your function to validate email password structure
@@ -269,7 +269,7 @@ function main {
 
     Write-Host
 
-    while ($true) {
+    while (1) {
         $email_receiver_unit_test = Read-Host "Enter the email receiver for unit test : "
 
         # Check if the email address is valid
@@ -281,9 +281,9 @@ function main {
         }
     }
 
-    update_env_variable "env/tests.env" "EMAIL_SENDER_UNIT_TEST" $email_sender_unit_test $true
-    update_env_variable "env/tests.env" "EMAIL_RECEIVER_UNIT_TEST" $email_receiver_unit_test $true
-    update_env_variable "env/tests.env" "PASSWORD_UNIT_TEST" $password $false
+    update_env_variable "env/tests.env" "EMAIL_SENDER_UNIT_TEST" $email_sender_unit_test 1
+    update_env_variable "env/tests.env" "EMAIL_RECEIVER_UNIT_TEST" $email_receiver_unit_test 1
+    update_env_variable "env/tests.env" "PASSWORD_UNIT_TEST" $password 0
 }
 
 # Execute the main function
