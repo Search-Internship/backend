@@ -158,7 +158,7 @@ async def send_emails(access_token:str= Form(None),emails: UploadFile = File(Non
 
 
 @api_router.post("/email/send-verification-code")
-async def send_verification_email_code(to: str = Form(...),language:str = Form("fr")):
+async def send_verification_email_code(to: str = Form(...),language:str = Form("fr"),length:int=Form(4),type_:str=Form("number")):
     """
     Send a verification code to the provided email address.
     """
@@ -167,7 +167,7 @@ async def send_verification_email_code(to: str = Form(...),language:str = Form("
     #Check the validity of email and password to connect to gmail
     if not check_gmail_connection(EMAIL_PROJECT,PASSWORD_EMAIL_PROJECT):
         raise EmailConnectionFailedException("Failed to connect to gmail.")
-    code_generated:str=generate_random_code()
+    code_generated:str=generate_random_code(length,type_)
     email_subject:str="Verification code"
     email_body:str=f"<h1>Your code is {code_generated}</h1>"
     is_send:bool=send_email_smtp(

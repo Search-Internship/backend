@@ -235,6 +235,9 @@ $ docker run -p you_port:5000 ema-back:tagname
 - **Request Body**:
   - `to` (string): Recipient email address.
   - `language` (string, optional): Language of the email content (default: "fr").
+  - `type_` (string, optional): The type of code : number,string,mixte (default: "number").
+  - `length` (int, optional): The length of code sended (default: 4).
+  
 - **Response**:
   - **Status Code**: 200 OK
   - **Response Body**:
