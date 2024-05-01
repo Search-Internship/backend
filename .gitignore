@@ -4,3 +4,4 @@
 Dockerfile
 .dockerignore
 venv
+data/resume

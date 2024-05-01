@@ -1,5 +1,6 @@
 import os
 import sys
+import uuid
 parent_dir = os.path.abspath(os.path.join(os.getcwd(), '.'))
 sys.path.append(parent_dir)
 from utils.file_txt import parse_text_file
@@ -75,7 +76,7 @@ async def send_emails(access_token:str= Form(None),emails: UploadFile = File(Non
     if user is None:
         raise HTTPException(status_code=401, detail="Invalid access token")
     sender_email:str=user.email
-    sender_password:str=user.email_password
+    sender_password:str=user.get_email_password(encryption_key=FERNET_KEY)
     # Check if any of the files are null
     if emails is None:
         raise FileNotFoundException(detail="Emails TXT files are missing.")
@@ -100,11 +101,27 @@ async def send_emails(access_token:str= Form(None),emails: UploadFile = File(Non
     #Check the validity of email and password to connect to gmail
     if not check_gmail_connection(sender_email,sender_password):
         raise EmailConnectionFailedException("Failed to connect to gmail.")
-    temp_dir = str(Path("./temp"))
+    temp_dir:str = str(Path("./temp"))
+    resume_dir:str = str(Path("./data/resume"))
+    data_dir:str = str(Path("./data"))
+    # Check if data directory exists, if not, create it
+    if not os.path.exists(data_dir):
+        os.makedirs(data_dir)
+
+    # Check if resume directory exists within data directory, if not, create it
+    if not os.path.exists(resume_dir):
+        os.makedirs(resume_dir)
+    
+    # Check if temp_dir exists, if not, create it
+    if not os.path.exists(temp_dir):
+        os.makedirs(temp_dir)
+
+
+    pdf_id:str = str(uuid.uuid4())
     with open(f"{temp_dir}/emails.txt", "wb") as emails_file:
         shutil.copyfileobj(emails.file, emails_file)
 
-    with open(f"{temp_dir}/resume.pdf", "wb") as resume_file:
+    with open(f"{resume_dir}/{pdf_id}.pdf", "wb") as resume_file:
         shutil.copyfileobj(resume.file, resume_file)
     
     # Proceed with processing if the files are of the correct types
@@ -115,16 +132,16 @@ async def send_emails(access_token:str= Form(None),emails: UploadFile = File(Non
 
     # Iterate over the parsed emails list and process each email address
     for email in emails_list:
-        if send_email_smtp(sender_email,sender_password,email,email_subject,email_body,f"{temp_dir}/resume.pdf"):
+        if send_email_smtp(sender_email,sender_password,email,email_subject,email_body,f"{resume_dir}/{pdf_id}.pdf"):
             success_receiver.append(email)
         else:
             failed_receiver.append(email)
     try:
-        is_saved_operations:bool=Operations.create_operation(sender_email,encrypt_pdf_to_base64(f"{temp_dir}/resume.pdf"),email_body,email_subject,",".join(success_receiver),",".join(failed_receiver),user_id)
+        is_saved_operations:bool=Operations.create_operation(session,sender_email,email_body,email_subject,",".join(success_receiver),",".join(failed_receiver),pdf_id,user_id)
     except ValueError as ve:
         raise UserExistException(detail="User does not exist with the provided user id")
     os.remove(f"{temp_dir}/emails.txt")
-    os.remove(f"{temp_dir}/resume.pdf")
+
     if is_saved_operations:
         return {"success_receiver": success_receiver, "failed_receiver": failed_receiver,"saved":is_saved_operations}
     return {"success_receiver": success_receiver, "failed_receiver": failed_receiver,"saved":False}

@@ -190,6 +190,7 @@ class Operations(Base):
     time = Column(String,max_length=255)
     email_body = Column(String,max_length=255)
     subject = Column(String,max_length=255)
+    pdf_id = Column(String,max_length=37)
     success_receiver = Column(Text)
     failed_receiver = Column(Text)
     user_id = Column(String, ForeignKey('users.id'))
@@ -198,7 +199,7 @@ class Operations(Base):
     user = relationship("User", back_populates="operations")
 
     @classmethod
-    def create_operation(cls, session, from_email, email_body, subject, success_receiver, failed_receiver, user_id):
+    def create_operation(cls, session, from_email, email_body, subject, success_receiver, failed_receiver,pdf_id, user_id):
         """
         Create a new operation associated with a user.
 
@@ -232,6 +233,7 @@ class Operations(Base):
             subject=subject,
             success_receiver=success_receiver,
             failed_receiver=failed_receiver,
+            pdf_id=pdf_id,
             user_id=user_id
         )
         
@@ -311,5 +313,6 @@ class Operations(Base):
             'subject': operation.subject,
             'success_receiver': operation.success_receiver,
             'failed_receiver': operation.failed_receiver,
+            'pdf_id': operation.pdf_id,
             'user_id': operation.user_id
         }

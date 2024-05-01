@@ -58,7 +58,7 @@ if is_connect:
         # SQL query to create the users table
         create_table_query = """
         CREATE TABLE IF NOT EXISTS users (
-            id VARCHAR(255) PRIMARY KEY,
+            id VARCHAR(37) PRIMARY KEY,
             username VARCHAR(255),
             date VARCHAR(255),
             time VARCHAR(255),
@@ -83,12 +83,13 @@ if is_connect:
         # SQL query to create the operations table
         create_operations_table_query = """
         CREATE TABLE IF NOT EXISTS operations (
-            id VARCHAR(255) PRIMARY KEY,
+            id VARCHAR(37) PRIMARY KEY,
             from_email VARCHAR(255),
             date VARCHAR(255),
             time VARCHAR(255),
             email_body TEXT,
             subject TEXT,
+            pdf_id VARCHAR(37),
             success_receiver VARCHAR(255),
             failed_receiver VARCHAR(255),
             user_id VARCHAR(255),
