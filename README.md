@@ -16,33 +16,45 @@ $ .\scripts\setup.ps1
 ```
 
 
+**Note**: This note serves as a reminder to users to be careful while running the setup scripts, especially if they're reusing a database name that may exist already.
+
+
+
 
 
 ## Envirenment Variable :
 ### 1. `env/database.env` :
-#### USER_NAME
+#### USER_NAME (ALL - {sqlite})
 - **Description**: The username used to authenticate to the database.
 - **Example**: `USER_NAME="root"`
 
-#### PASSWORD
+#### PASSWORD (ALL - {sqlite})
 - **Description**: The password used to authenticate to the database.
 - **Example**: `PASSWORD="admin"`
 
-#### PORT
+#### PORT (ALL - {sqlite})
 - **Description**: The port number on which the database server is listening.
 - **Example**: `PORT="3306"`
 
-#### HOST
+#### HOST (ALL - {sqlite})
 - **Description**: The hostname or IP address of the database server.
 - **Example**: `HOST="localhost"`
 
-#### DB_NAME
+#### DB_NAME (ALL - {sqlite})
 - **Description**: The name of the database.
 - **Example**: `DB_NAME="easyinternship"`
 
-#### DB_TYPE
+#### DB_TYPE (ALL - {sqlite})
 - **Description**: The type of the database ['mysql','mariadb','postgresql','oracle','oracledb','mssql','sqlserver','sqlite'].
 - **Example**: `DB_TYPE="mysql"`
+
+#### SERVICE_NAME (Only for Oracle)
+- **Description**: The service name or SID of the Oracle database. This parameter is used to identify the specific Oracle instance to connect to.
+- **Example**: `SERVICE_NAME="ORCL"`
+
+### DB_FILE_PATH (Only for Sqlite)
+- **Description**: The file path for the SQLite database. This parameter is used when the database type is set to 'sqlite'.
+- **Example**: `DB_FILE_PATH="/path/to/database.db"`
 
 ### 2. `env/secrets.env` :
 #### FERNET_KEY
@@ -90,7 +102,7 @@ $ .\scripts\setup.ps1
 ## Running the app : 
 ```bash
 # Run application
-$ python3 scripts/database.py ; uvicorn src.main:app --host 127.0.0.1 --port 5000 --reload
+$ uvicorn src.main:app --host 127.0.0.1 --port 5000 --reload
 ```
 ## Build Docker image : 
 ```bash

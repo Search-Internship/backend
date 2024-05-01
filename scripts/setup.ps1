@@ -186,7 +186,12 @@ function main {
         if ([string]::IsNullOrEmpty($port)) {
             $port = 1521
         }
+        $service_name = Read-Host "Enter the service name (default is ORCL): "
+        if ([string]::IsNullOrEmpty($service_name)) {
+            $service_name = "ORCL"
+        }
         update_env_variable "env/database.env" "PORT" $port 1
+        update_env_variable "env/database.env" "SERVICE_NAME" $service_name 1
     } elseif ($db_type -eq "mssql" -or $db_type -eq "sqlserver") {
         $port = Read-Host "Enter the port (default is 1433): "
         if ([string]::IsNullOrEmpty($port)) {
@@ -316,6 +321,23 @@ function main {
     update_env_variable "env/tests.env" "EMAIL_SENDER_UNIT_TEST" $email_sender_unit_test 1
     update_env_variable "env/tests.env" "EMAIL_RECEIVER_UNIT_TEST" $email_receiver_unit_test 1
     update_env_variable "env/tests.env" "PASSWORD_UNIT_TEST" $password 0
+
+    ## Create the database
+    if ($db_type -eq "mysql" -or $db_type -eq "mariadb") {
+        python scipts\databases\mysql.py
+    } elseif ($db_type -eq "oracle" -or $db_type -eq "oracledb") {
+        python scipts\databases\oracle.py
+    } elseif ($db_type -eq "mssql" -or $db_type -eq "sqlserver") {
+        python scipts\databases\mssql.py
+    } elseif ($db_type -eq "postgresql") {
+        python scipts\databases\postgresql.py
+    } elseif ($db_type -eq "sqlite") {
+        python scipts\databases\sqlite.py
+    }
+
+
+
+
 }
 
 # Execute the main function

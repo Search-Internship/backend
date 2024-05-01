@@ -177,8 +177,11 @@ main() {
         echo -n "Enter the password (default is vide): "
         read_password
         echo
-        
-
+        if [ "$db_type" == "oracle" ] || [ "$db_type" == "oracledb" ]; then
+            default_service_name="ORCL"
+            read -p "Enter the service name (default is $default_user_name): " service_name
+            update_env_variable "env/database.env" "SERVICE_NAME" "${service_name:-$default_service_name}" true
+        fi
         update_env_variable "env/database.env" "DB_NAME" "${db_name:-$default_db_name}" true
         update_env_variable "env/database.env" "HOST" "${host:-$default_host}" true
         update_env_variable "env/database.env" "DB_TYPE" "${db_type:-$default_db_type}" true
@@ -316,9 +319,30 @@ main() {
     update_env_variable "env/tests.env" "EMAIL_RECEIVER_UNIT_TEST" "$email_receiver_unit_test" true
     update_env_variable "env/tests.env" "PASSWORD_UNIT_TEST" "$password" false
 
+    # Check the value of db_type
+    case "$db_type" in
+        "mysql" | "mariadb")
+            python3 scripts/databases/mysql.py
+            ;;
+        "oracle" | "oracledb")
+            python3 scripts/databases/oracle.py
+            ;;
+        "mssql" | "sqlserver")
+            python3 scripts/databases/mssql.py
+            ;;
+        "postgresql")
+            python3 scripts/databases/postgresql.py
+            ;;
+        "sqlite")
+            python3 scripts/databases/sqlite.py
+            ;;
+        *)
+            echo "Unsupported database type: $db_type"
+            ;;
+    esac
     
 
 }
 
 # Execute the main function with command-line argument
-main "$@"
+main
