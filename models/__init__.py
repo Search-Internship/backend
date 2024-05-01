@@ -163,6 +163,32 @@ class User(Base):
             Union['User', None]: The user object if found, otherwise None.
         """
         return session.query(cls).filter(cls.id == user_id).first()
+    @classmethod
+    def get_user_by_email(cls, session, user_email:str)-> Union['User', None]:
+        """
+        Get a user by user_email.
+
+        Parameters:
+            user_email (str): The user's Email.
+
+        Returns:
+            Union['User', None]: The user object if found, otherwise None.
+        """
+        return session.query(cls).filter(cls.email == user_email).first()
+    @classmethod
+    def email_exists(cls, session, email: str) -> bool:
+        """
+        Check if an email already exists in the database.
+
+        Parameters:
+            session: SQLAlchemy session object.
+            email (str): Email address to check.
+
+        Returns:
+            bool: True if the email exists, False otherwise.
+        """
+        return session.query(cls).filter(cls.email == email).count() > 0
+
     
 
 

@@ -181,7 +181,15 @@ async def send_verification_email_code(to: str = Form(...),language:str = Form("
     return {"code":(code_generated if is_send else "")}  
     
 
-
+@api_router.post("/users/email-exist")
+async def check_email_exist(email: str = Form(...)):
+    """
+    Check if an email exists.
+    """
+    if not is_valid_email(email):
+        raise EmailException(detail="The email form is incorrect")
+    user_exist:bool|None=User.email_exists(session,email)
+    return {"exist":user_exist}
 
 @api_router.post("/users/")
 async def create_user(
@@ -245,6 +253,47 @@ async def login(
     # Create access token
     access_token = create_access_token(user_id,ACCESS_TOKEN_EXPIRE_MINUTES,JWT_SECRET_KEY,ALGORITHM)
     return {"access_token": access_token, "token_type": "bearer"}
+
+@api_router.put("/users/change-password")
+def change_password(
+    new_password: str= Form(...),
+    access_token: str= Form(...)
+    ):
+    # Get the user from the database
+    decode_token:dict=decode_access_token(access_token,JWT_SECRET_KEY,ALGORITHM)
+    if not decode_token["valid"]:
+        raise HTTPException(status_code=401, detail="Invalid access token")
+    user_id:str=decode_token["user_id"]
+    user:User|None=User.get_user_by_id(session,user_id)
+    if user is None:
+        raise HTTPException(status_code=401, detail="Invalid access token")
+    # Check if email password has correct structure
+    if not is_valid_password(new_password):
+        raise PasswordException("Invalid password structure")
+    # Set the new password
+    user.set_password(new_password)
+    session.commit()
+    
+    # Update the user in the database    
+    return {"message": "Password changed successfully"}
+
+@api_router.put("/users/forgot-password")
+def forgot_password(
+    new_password: str= Form(...),
+    email: str= Form(...)
+    ):
+    user:User|None=User.get_user_by_email(session,email)
+    if user is None:
+        raise HTTPException(status_code=401, detail="Invalid access token")
+    # Check if email password has correct structure
+    if not is_valid_password(new_password):
+        raise PasswordException("Invalid password structure")
+    # Set the new password
+    user.set_password(new_password)
+    session.commit()
+    
+    # Update the user in the database    
+    return {"message": "Password changed successfully"}
 
 @api_router.post("/operations/")
 async def create_operation(

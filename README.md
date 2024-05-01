@@ -270,6 +270,14 @@ $ docker run -p you_port:5000 ema-back:tagname
   - `password` (string): User's password.
   - `phone_number` (string): User's phone number.
   - `email_password` (string, optional): Password for user's email account.
+- **Password Constraint**:
+  - Passwords must meet the following criteria:
+    - Contains at least one lowercase character
+    - Contains at least one uppercase character
+    - Contains at least one digit
+    - Has a minimum length of 8 characters
+  - Email Passwoed meet the following criteria:
+    - General form : xxxx xxxx xxxx xxxx , with x is a number or alphabet
 - **Response**:
   - **Status Code**: 200 OK
   - **Response Body**:
@@ -297,6 +305,70 @@ $ docker run -p you_port:5000 ema-back:tagname
         "token_type": "bearer"
     }
     ```
+
+### Check Email Existence
+
+- **URL**: `POST /api/users/email-exist`
+- **Description**: Check if an email exists.
+- **Request Body**:
+  - `email` (string): The email address to check.
+- **Response**:
+  - **Status Code**: 200 OK
+  - **Response Body**:
+    ```json
+    {
+        "exist": true
+    }
+    ```
+    - `exist` (boolean): Indicates whether the email exists (`true`) or not (`false`).
+
+
+
+### Changing Password
+
+- **URL**: `PUT /api/users/change-password`
+- **Description**: Change the password for a user.
+- **Request Body**:
+  - `new_password` (string): The new password for the user.
+  - `access_token` (string): Token for accessing the user account.
+- **Password Constraint**:
+  - Passwords must meet the following criteria:
+    - Contains at least one lowercase character
+    - Contains at least one uppercase character
+    - Contains at least one digit
+    - Has a minimum length of 8 characters
+- **Response**:
+  - **Status Code**: 200 OK
+  - **Response Body**:
+    ```json
+    {
+        "message": "Password changed successfully"
+    }
+    ```
+
+### Forgot Password
+
+- **URL**: `PUT /api/users/forgot-password`
+- **Description**: Reset the password for a user who has forgotten it.
+- **Request Body**:
+  - `new_password` (string): The new password for the user.
+  - `email` (string): The email address of the user.
+- **Password Constraint**:
+  - Passwords must meet the following criteria:
+    - Contains at least one lowercase character
+    - Contains at least one uppercase character
+    - Contains at least one digit
+    - Has a minimum length of 8 characters
+- **Response**:
+  - **Status Code**: 200 OK
+  - **Response Body**:
+    ```json
+    {
+        "message": "Password changed successfully"
+    }
+    ```
+
+
 
 ### Create Operation
 
