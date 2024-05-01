@@ -163,7 +163,7 @@ $ docker run -p you_port:5000 ema-back:tagname
 
 | Attribute       | Description                                         |
 |-----------------|-----------------------------------------------------|
-| id              | Unique identifier for the user.                    |
+| id              | Unique identifier for the user.                     |
 | username        | User's username.                                    |
 | email           | User's email address (unique).                      |
 | linkedin_link   | User's LinkedIn profile link.                       |
@@ -177,17 +177,18 @@ $ docker run -p you_port:5000 ema-back:tagname
 
 ### Operations : 
 
-| Attribute         | Description                                                    |
-|-------------------|----------------------------------------------------------------|
-| id                | Unique identifier for the operation.                          |
-| from_email        | Source email address.                                         |
-| date              | Date of the operation.                                        |
-| time              | Time of the operation.                                        |
-| email_body        | Body of the email.                                            |
-| subject           | Subject of the email.                                         |
-| success_receiver  | Receiver of the successful operation.                         |
-| failed_receiver   | Receiver of the failed operation.                             |
-| user_id           | Foreign key referencing the id of the user associated.        |
+| Attribute         | Description                                                                 |
+|-------------------|-----------------------------------------------------------------------------|
+| id                | Unique identifier for the operation.                                        |
+| from_email        | Source email address.                                                       |
+| date              | Date of the operation.                                                      |
+| time              | Time of the operation.                                                      |
+| email_body        | Body of the email.                                                          |
+| subject           | Subject of the email.                                                       |
+| success_receiver  | Receiver of the successful operation.                                       |
+| failed_receiver   | Receiver of the failed operation.                                           |
+| user_id           | Foreign key referencing the id of the user associated.                      |
+| pdf_id            | The id of the pdf send in this operations and stored in data/resume         |
 
 
 ## API Endpoints
