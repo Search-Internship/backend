@@ -44,7 +44,7 @@ def message_from_file(EntrepriseContactName: str, EntrepriseName: str, Entrepris
 
 
 def send_email_smtp(sender_email: str, sender_password: str, to: str, email_subject: str, email_body: str,
-                    attachment_path: str = None) -> bool:
+                    attachment_path: str = None, attachment_name: str = None) -> bool:
     """
     Send an email using SMTP.
 
@@ -55,6 +55,7 @@ def send_email_smtp(sender_email: str, sender_password: str, to: str, email_subj
     - email_subject (str): The subject of the email.
     - email_body (str): The body of the email in HTML format.
     - attachment_path (str, optional): Path to the attachment file.
+    - attachment_name (str, optional): Name of the attachment file.
 
     Returns:
     - bool: True if the email is sent successfully, False otherwise.
@@ -75,7 +76,8 @@ def send_email_smtp(sender_email: str, sender_password: str, to: str, email_subj
         msg.attach(MIMEText(email_body, 'html'))
 
         if attachment_path:
-            attachment_name = attachment_path.split("/")[-1]
+            if not attachment_name:
+                attachment_name = attachment_path.split("/")[-1]
             attachment = open(attachment_path, "rb")
             part = MIMEBase('application', 'octet-stream')
             part.set_payload((attachment).read())
@@ -92,6 +94,7 @@ def send_email_smtp(sender_email: str, sender_password: str, to: str, email_subj
         is_sent = False
     finally:
         return is_sent
+
 
 
 

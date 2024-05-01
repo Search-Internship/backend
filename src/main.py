@@ -132,7 +132,7 @@ async def send_emails(access_token:str= Form(None),emails: UploadFile = File(Non
 
     # Iterate over the parsed emails list and process each email address
     for email in emails_list:
-        if send_email_smtp(sender_email,sender_password,email,email_subject,email_body,f"{resume_dir}/{pdf_id}.pdf"):
+        if send_email_smtp(sender_email,sender_password,email,email_subject,email_body,f"{resume_dir}/{pdf_id}.pdf",resume.filename):
             success_receiver.append(email)
         else:
             failed_receiver.append(email)
