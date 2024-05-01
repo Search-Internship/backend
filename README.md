@@ -52,7 +52,7 @@ $ .\scripts\setup.ps1
 - **Description**: The service name or SID of the Oracle database. This parameter is used to identify the specific Oracle instance to connect to.
 - **Example**: `SERVICE_NAME="ORCL"`
 
-### DB_FILE_PATH (Only for Sqlite)
+#### DB_FILE_PATH (Only for Sqlite)
 - **Description**: The file path for the SQLite database. This parameter is used when the database type is set to 'sqlite'.
 - **Example**: `DB_FILE_PATH="/path/to/database.db"`
 
