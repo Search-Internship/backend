@@ -324,7 +324,7 @@ function main {
 
     ## Create the database
     if ($db_type -eq "mysql" -or $db_type -eq "mariadb") {
-        python scipts\databases\mysql.py
+        python scipts\databases\mysql_.py
     } elseif ($db_type -eq "oracle" -or $db_type -eq "oracledb") {
         python scipts\databases\oracle.py
     } elseif ($db_type -eq "mssql" -or $db_type -eq "sqlserver") {

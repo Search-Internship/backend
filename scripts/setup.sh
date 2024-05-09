@@ -180,7 +180,13 @@ main() {
         if [ "$db_type" == "oracle" ] || [ "$db_type" == "oracledb" ]; then
             default_service_name="ORCL"
             read -p "Enter the service name (default is $default_user_name): " service_name
+            default_tablespace_name="USERS"
+            read -p "Enter the tablespace name (default is $default_tablespace_name): " tablespace_name
+            default_data_file_size="100M"
+            read -p "Enter the data file size (default is $default_tablespace_name): " data_file_size
             update_env_variable "env/database.env" "SERVICE_NAME" "${service_name:-$default_service_name}" true
+            update_env_variable "env/database.env" "TABLESPACE_NAME" "${tablespace_name:-$default_tablespace_name}" true
+            update_env_variable "env/database.env" "TABLESPACE_NAME" "${data_file_size:-$default_data_file_size}" true
         fi
         update_env_variable "env/database.env" "DB_NAME" "${db_name:-$default_db_name}" true
         update_env_variable "env/database.env" "HOST" "${host:-$default_host}" true
@@ -322,7 +328,7 @@ main() {
     # Check the value of db_type
     case "$db_type" in
         "mysql" | "mariadb")
-            python3 scripts/databases/mysql.py
+            python3 scripts/databases/mysql_.py
             ;;
         "oracle" | "oracledb")
             python3 scripts/databases/oracle.py

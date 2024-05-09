@@ -20,7 +20,7 @@ try:
     # Create database if it doesn't exist
     cursor.execute(f"IF DB_ID('{os.getenv('DB_NAME')}') IS NOT NULL DROP DATABASE [{os.getenv('DB_NAME')}]")
 
-    cursor.execute(f"CREATE DATABASE [{os.getenv('DB_NAME')}]")
+    cursor.execute(f"CREATE DATABASE IF NOT EXISTS [{os.getenv('DB_NAME')}]")
     
     # Close cursor and connection
     cursor.close()

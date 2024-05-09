@@ -19,7 +19,7 @@ try:
     cursor = connection.cursor()
     
     # Create database if it doesn't exist
-    cursor.execute(f"DROP DATABASE {os.getenv('DB_NAME')}")
+    cursor.execute(f"DROP DATABASE IF EXISTS {os.getenv('DB_NAME')}")
 
     cursor.execute(f"CREATE DATABASE IF NOT EXISTS {os.getenv('DB_NAME')}")
     

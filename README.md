@@ -44,13 +44,22 @@ $ .\scripts\setup.ps1
 - **Description**: The name of the database.
 - **Example**: `DB_NAME="easyinternship"`
 
-#### DB_TYPE (ALL - {sqlite})
+#### DB_TYPE (ALL)
 - **Description**: The type of the database ['mysql','mariadb','postgresql','oracle','oracledb','mssql','sqlserver','sqlite'].
 - **Example**: `DB_TYPE="mysql"`
 
 #### SERVICE_NAME (Only for Oracle)
 - **Description**: The service name or SID of the Oracle database. This parameter is used to identify the specific Oracle instance to connect to.
 - **Example**: `SERVICE_NAME="ORCL"`
+
+
+#### TABLESPACE_NAME (Only for Oracle)
+- **Description**: Specifies the name of the tablespace where the data file will be stored.
+- **Example**: `TABLESPACE_NAME="USERS"`
+
+#### DATAFILE_SIZE (Only for Oracle)
+- **Description**: Sets the initial size of the data file in the specified tablespace. It determines how much disk space is initially allocated for the data file.
+- **Example**: `DATAFILE_SIZE="100M"`
 
 #### DB_FILE_PATH (Only for Sqlite)
 - **Description**: The file path for the SQLite database. This parameter is used when the database type is set to 'sqlite'.
