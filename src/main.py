@@ -189,8 +189,12 @@ async def check_email_exist(email: str = Form(...)):
     """
     if not is_valid_email(email):
         raise EmailException(detail="The email form is incorrect")
-    user_exist:bool|None=User.email_exists(session,email)
-    return {"exist":user_exist}
+    user:User|None=User.get_user_by_email(session,email)
+    if user:
+        access_token = create_access_token(user.id,ACCESS_TOKEN_EXPIRE_MINUTES,JWT_SECRET_KEY,ALGORITHM)
+        return {"exist":True,"access_token":access_token}
+    return {"exist":False,"access_token":""}
+
 
 @api_router.post("/users/")
 async def create_user(
@@ -278,6 +282,7 @@ def change_password(
     # Update the user in the database    
     return {"message": "Password changed successfully"}
 
+"""
 @api_router.put("/users/forgot-password")
 def forgot_password(
     new_password: str= Form(...),
@@ -295,7 +300,7 @@ def forgot_password(
     
     # Update the user in the database    
     return {"message": "Password changed successfully"}
-
+"""
 @api_router.post("/operations/")
 async def create_operation(
     email_body: str = Form(...),

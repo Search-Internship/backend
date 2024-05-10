@@ -100,7 +100,7 @@ def get_email_body(resume_pdf_path:str,email_subject:str,language:str)->list:
     """
     page_contents=get_pages_contents_from_pdf(resume_pdf_path)
     llm = ChatGoogleGenerativeAI(model=MODEL_NAME,google_api_key=GEMINI_API_KEY,project=PROJECT_NAME)
-    result = llm.invoke(f"Generate en lqnguage : {language} an email Body on markdown language from this resume {page_contents} and email subject is : {email_subject}")
+    result = llm.invoke(f"Generate an email body with this spe")
 
     return remove_markdown(result.content)
 
