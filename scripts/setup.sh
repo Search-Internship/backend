@@ -146,7 +146,7 @@ main() {
     read -p "Enter the virtual envirenment name (default is $VENV_NAME): " venv_name
     create_and_activate_venv "${venv_name:-$VENV_NAME}"
 
-    available_db=( ["mysql"]="mysql-connector-python" ["postgresql"]="psycopg2" ["oracle"]="cx_Oracle" ["oracledb"]="cx_Oracle" ["mssql"]="pymssql" ["sqlserver"]="pymssql" ["sqlite"]="")
+    available_db=( ["mysql"]="mysql-connector-python" ["postgresql"]="psycopg2-binary" ["oracle"]="cx_Oracle" ["oracledb"]="cx_Oracle" ["mssql"]="pymssql" ["sqlserver"]="pymssql" ["sqlite"]="")
 
     db_module=${available_db[$db_type]}
     if [ -n "$db_module" ]; then

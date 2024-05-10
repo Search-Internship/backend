@@ -18,7 +18,20 @@ $ .\scripts\setup.ps1
 
 **Note**: This note serves as a reminder to users to be careful while running the setup scripts, especially if they're reusing a database name that may exist already.
 
+## Project Structure :
+This project's directory structure is inspired by the article "[Structuring a FastAPI App: An In-Depth Guide](https://medium.com/@ketansomvanshi007/structuring-a-fastapi-app-an-in-depth-guide-cdec3b8f4710)" on Medium.
 
+- **chat** : Directory for chat related functionality
+- **docker** : The `docker` directory includes Docker-related files for containerizing the FastAPI application. It typically contains a Dockerfile and a docker-compose.yml file for defining the application's Docker image and services.
+- **models** : The `models` directory holds the data models or schemas used by the application. It includes files for defining the application's models and their relationships. This also helps us to implement DTO(Data Transfer through Objects) pattern where we are exchanging data in between different layers through these model instances.
+- **requirements** : Directory for requirements related files
+- **scripts** : The `scripts` directory contains utility scripts for various purposes, such as setting up the database or generating data. It typically includes scripts like init_db.sql for initializing the database.
+- **tests** : The `tests` directory contains unit tests to ensure the correctness of the application. It typically includes subdirectories for different components, such as service tests, and each test file corresponds to a specific component or module.
+- **utils** : The `utils` directory houses utility modules and files required for the application's functionality. It typically includes files for handling exceptions, providing helper functions, and implementing common functionality such as JWT token handling and password hashing.
+- **temp** : Directory for temporary files
+- **templates** : Directory for HTML templates
+- **src** :  Directory for source code of FastAPI application
+- **env** :  Directory for envrenment variables
 
 
 
@@ -484,20 +497,7 @@ $ docker run -p you_port:5000 ema-back:tagname
 
 
 
-## Project Structure :
-This project's directory structure is inspired by the article "[Structuring a FastAPI App: An In-Depth Guide](https://medium.com/@ketansomvanshi007/structuring-a-fastapi-app-an-in-depth-guide-cdec3b8f4710)" on Medium.
 
-- **chat** : Directory for chat related functionality
-- **docker** : The `docker` directory includes Docker-related files for containerizing the FastAPI application. It typically contains a Dockerfile and a docker-compose.yml file for defining the application's Docker image and services.
-- **models** : The `models` directory holds the data models or schemas used by the application. It includes files for defining the application's models and their relationships. This also helps us to implement DTO(Data Transfer through Objects) pattern where we are exchanging data in between different layers through these model instances.
-- **requirements** : Directory for requirements related files
-- **scripts** : The `scripts` directory contains utility scripts for various purposes, such as setting up the database or generating data. It typically includes scripts like init_db.sql for initializing the database.
-- **tests** : The `tests` directory contains unit tests to ensure the correctness of the application. It typically includes subdirectories for different components, such as service tests, and each test file corresponds to a specific component or module.
-- **utils** : The `utils` directory houses utility modules and files required for the application's functionality. It typically includes files for handling exceptions, providing helper functions, and implementing common functionality such as JWT token handling and password hashing.
-- **temp** : Directory for temporary files
-- **templates** : Directory for HTML templates
-- **src** :  Directory for source code of FastAPI application
-- **env** :  Directory for envrenment variables
 
 
 

@@ -20,8 +20,10 @@ from utils.validity import (is_gmail_password_structure,is_valid_email,
                             is_valid_password,is_linkedin_profile_link)
 import shutil
 from pathlib import Path
-
-from models import Operations,User
+from contextlib import asynccontextmanager
+# from models import Operations,User
+from models.user import User
+from models.operations import Operations
 from utils.jwt import (
                         create_access_token,decode_access_token
                       )
@@ -33,9 +35,10 @@ from utils.file_img import (
                              )
 from utils.generate import generate_random_code
 from dotenv import load_dotenv
-from database import session
+from database import init_db
 from chat.main import get_possible_job_titles,get_email_body
 
+session=init_db()
 
 # Load variables from the specified .env file
 load_dotenv(dotenv_path=str(Path("./env/secrets.env")))
@@ -307,7 +310,8 @@ async def create_operation(
     subject: str = Form(...),
     success_receiver: str = Form(...),
     failed_receiver: str = Form(...),
-    access_token: str = Form(...)
+    access_token: str = Form(...),
+    pdf_id: str = Form(...)
 ):
     """
     Create a new operation associated with a user.
@@ -330,7 +334,8 @@ async def create_operation(
             subject=subject,
             success_receiver=success_receiver,
             failed_receiver=failed_receiver,
-            user_id=user_id
+            user_id=user_id,
+            pdf_id=pdf_id
         )
         return {"message": "Operation created successfully"}
     except ValueError as ve:

@@ -1,14 +1,14 @@
 import uuid
 from sqlalchemy import Column, String, ForeignKey,Text
 from sqlalchemy.orm import relationship
-from sqlalchemy.ext.declarative import declarative_base
 import os
 import sys
 parent_dir = os.path.abspath(os.path.join(os.getcwd(), '.'))
 sys.path.append(parent_dir)
 import datetime
+from database import Base
+from models.user import User
 
-Base = declarative_base()
 
 class Operations(Base):
     """
@@ -19,31 +19,34 @@ class Operations(Base):
         from_email (str): Source email address.
         date (str): Date of the operation.
         time (str): Time of the operation.
-        resume_base64 (str): Base64 encoded PDF data.
         email_body (str): Body of the email.
         subject (str): Subject of the email.
         success_receiver (str): Receiver of the successful operation.
         failed_receiver (str): Receiver of the failed operation.
         user_id (str): Foreign key referencing the id of the user associated with this operation.
     """
+    
+
+    __table_args__ = {'extend_existing': True}
+
     __tablename__ = 'operations'
 
-    id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
-    from_email = Column(String,max_length=255)
-    date = Column(String,max_length=255)
-    time = Column(String,max_length=255)
-    resume_base64 = Column(Text)
-    email_body = Column(String,max_length=255)
-    subject = Column(String,max_length=255)
+    id = Column(String(37), primary_key=True, default=lambda: str(uuid.uuid4()))
+    from_email = Column(String(55))
+    date = Column(String(55))
+    time = Column(String(55))
+    email_body = Column(Text)
+    subject = Column(String(255))
+    pdf_id = Column(String(37))
     success_receiver = Column(Text)
     failed_receiver = Column(Text)
-    user_id = Column(String, ForeignKey('users.id'))
+    user_id = Column(String(37), ForeignKey('users.id'))
 
     # Define the relationship to the Users table
     user = relationship("User", back_populates="operations")
 
     @classmethod
-    def create_operation(cls, session, from_email, resume_base64, email_body, subject, success_receiver, failed_receiver, user_id):
+    def create_operation(cls, session, from_email, email_body, subject, success_receiver, failed_receiver,pdf_id, user_id):
         """
         Create a new operation associated with a user.
 
@@ -63,7 +66,6 @@ class Operations(Base):
         Raises:
             ValueError: If the user with the provided user_id does not exist.
         """
-        from models.user import User
         # Check if the user exists
         user = session.query(User).filter_by(id=user_id).first()
         if not user:
@@ -74,11 +76,11 @@ class Operations(Base):
             from_email=from_email,
             date=str(datetime.date.today()),  # Add current date
             time=str(datetime.datetime.now().time()),  # Add current time
-            resume_base64=resume_base64,
             email_body=email_body,
             subject=subject,
             success_receiver=success_receiver,
             failed_receiver=failed_receiver,
+            pdf_id=pdf_id,
             user_id=user_id
         )
         
@@ -101,7 +103,6 @@ class Operations(Base):
         Raises:
             ValueError: If the user with the provided user_id does not exist.
         """
-        from models.user import User
         # Check if the user exists
         user:User|None = session.query(User).filter_by(id=user_id).first()
         if not user:
@@ -137,7 +138,6 @@ class Operations(Base):
         Raises:
             ValueError: If the user with the provided user_id does not exist.
         """
-        from models.user import User
         # Check if the user exists
         user = session.query(User).filter_by(id=user_id).first()
         if not user:
@@ -156,10 +156,10 @@ class Operations(Base):
             'from_email': operation.from_email,
             'date': operation.date,
             'time': operation.time,
-            'resume_base64': operation.resume_base64,
             'email_body': operation.email_body,
             'subject': operation.subject,
             'success_receiver': operation.success_receiver,
             'failed_receiver': operation.failed_receiver,
+            'pdf_id': operation.pdf_id,
             'user_id': operation.user_id
         }

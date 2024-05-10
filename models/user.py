@@ -7,13 +7,11 @@ import sys
 from typing import Union
 parent_dir = os.path.abspath(os.path.join(os.getcwd(), '.'))
 sys.path.append(parent_dir)
-from sqlalchemy.ext.declarative import declarative_base
+from database import Base
 from sqlalchemy.orm import relationship
 import datetime
 
 
-# Base class for ORM
-Base = declarative_base()
 # Define User model
 class User(Base):
     """
@@ -31,17 +29,20 @@ class User(Base):
         time (str): Time of the operation.
         avatar_base64 (str): Base64 encoded avatar image.
     """
+
+
+    __table_args__ = {'extend_existing': True}
+
     __tablename__ = 'users'
-    id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
-    username = Column(String)
-    email = Column(String,unique=True)
-    linkedin_link = Column(String)
-    password_hash = Column(String)
-    phone_number = Column(String)
-    date = Column(String)
-    time = Column(String)
-    avatar_base64 = Column(String)
-    email_password = Column(String)  # Store encrypted email password
+    id = Column(String(37), primary_key=True, default=lambda: str(uuid.uuid4()))
+    username = Column(String(55))
+    email = Column(String(55),unique=True)
+    linkedin_link = Column(String(55))
+    password_hash = Column(String(255))
+    phone_number = Column(String(255))
+    date = Column(String(55))
+    time = Column(String(55))
+    email_password = Column(String(255))  # Store encrypted email password
     # Define the relationship to the Operations table
     operations = relationship("Operations", back_populates="user")
     def set_password(self, password:str)->None:
@@ -95,7 +96,7 @@ class User(Base):
         return decrypted_password
 
     @classmethod
-    def create_user(cls, session, username:str, email:str, linkedin_link:str, password:str, phone_number:str, email_password:str, encryption_key:str, avatar_base64:str)->bool:
+    def create_user(cls, session, username:str, email:str, linkedin_link:str, password:str, phone_number:str, email_password:str, encryption_key:str)->bool:
         """
         Create a new user and add them to the database.
 
@@ -107,7 +108,6 @@ class User(Base):
             phone_number (str): User's phone number.
             email_password (str): User's email password.
             encryption_key (str): Encryption key to encrypt email password.
-            avatar_base64 (str): Base64 encoded avatar image.
         Returns:
             bool: The user created or not.
         """
@@ -120,7 +120,6 @@ class User(Base):
             email=email,
             linkedin_link=linkedin_link,
             phone_number=phone_number,
-            avatar_base64=avatar_base64,
             date=str(datetime.date.today()),  # Add current date
             time=str(datetime.datetime.now().time())  # Add current time
         )
@@ -166,3 +165,31 @@ class User(Base):
             Union['User', None]: The user object if found, otherwise None.
         """
         return session.query(cls).filter(cls.id == user_id).first()
+    @classmethod
+    def get_user_by_email(cls, session, user_email:str)-> Union['User', None]:
+        """
+        Get a user by user_email.
+
+        Parameters:
+            user_email (str): The user's Email.
+
+        Returns:
+            Union['User', None]: The user object if found, otherwise None.
+        """
+        return session.query(cls).filter(cls.email == user_email).first()
+    @classmethod
+    def email_exists(cls, session, email: str) -> bool:
+        """
+        Check if an email already exists in the database.
+
+        Parameters:
+            session: SQLAlchemy session object.
+            email (str): Email address to check.
+
+        Returns:
+            bool: True if the email exists, False otherwise.
+        """
+        return session.query(cls).filter(cls.email == email).count() > 0
+
+    
+

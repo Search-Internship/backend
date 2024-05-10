@@ -4,10 +4,9 @@ import uuid
 parent_dir = os.path.abspath(os.path.join(os.getcwd(), '.'))
 sys.path.append(parent_dir)
 from dotenv import load_dotenv
-from langchain.document_loaders import PyPDFLoader
+from langchain_community.document_loaders import PyPDFLoader
 from pathlib import Path
 from langchain_google_genai import ChatGoogleGenerativeAI
-from langchain_core.messages import AIMessage
 import re
 
 
