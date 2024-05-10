@@ -345,6 +345,7 @@ $ docker run -p you_port:5000 ema-back:tagname
     }
     ```
     - `exist` (boolean): Indicates whether the email exists (`true`) or not (`false`).
+    - `access_token` (string): Token for accessing the user account.
 
 
 
