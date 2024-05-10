@@ -107,6 +107,20 @@ $ .\scripts\setup.ps1
 - **Description**: The password of project used for send emails for users.
 - **Example**: `PASSWORD_UNIT_TEST="fyxx cazo wmyo mnfu"`
 
+### 5. `env/chat.env` :
+
+#### GEMINI_API_KEY
+- **Description**: Clé API Gemini nécessaire pour l'accès à l'API. Vous pouvez en obtenir une auprès de [Gemini Api](https://aistudio.google.com/app/apikey).
+- **Example**: `GEMINI_API_KEY="AIzaSyDLammntfeotZZHWmCf3HPVyd7Zqxfw"`
+
+#### MODEL_NAME
+- **Description**: Nom du modèle utilisé pour le chat.
+- **Example**: `MODEL_NAME="gemini-pro"`
+
+#### PROJECT_NAME
+- **Description**: Nom du projet ou de l'application.
+- **Example**: `PROJECT_NAME="easy internship"`
+
 
 ## Running the app : 
 ```bash
@@ -415,6 +429,39 @@ $ docker run -p you_port:5000 ema-back:tagname
   - **Response Body**: List of operations.
 
   
+
+  ### Get Possible Job Titles
+
+- **URL**: `POST /api/chat/possible-job-titles`
+- **Description**: Sends internship emails with attachments.
+- **Request Body**:
+  - `resume` (file): Resume PDF file.
+- **Response**:
+  - **Status Code**: 200 OK
+  - **Response Body**:
+    ```json
+    {
+        "possible_job_titles": ["Job Title 1", "Job Title 2", ...]
+    }
+    ```
+
+### Generate Email Body
+
+- **URL**: `POST /api/chat/generated-email-body`
+- **Description**: Generates the email body for application sending.
+- **Request Body**:
+  - `resume` (file): Resume PDF file.
+  - `language` (string, optional): Email language (default: English).
+  - `email_subject` (string): Email subject.
+- **Response**:
+  - **Status Code**: 200 OK
+  - **Response Body**:
+    ```json
+    {
+        "email_body": "Generated email body"
+    }
+    ```
+
 
 
 

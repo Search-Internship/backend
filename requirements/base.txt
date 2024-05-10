@@ -1,9 +1,19 @@
+# Fast API
 uvicorn
 fastapi[all]
 python-multipart
+# LangChain and LLM
+langchain
 PyPDF2
+pypdf
+vertexai 
+langchain_google_genai
+# Database
 sqlalchemy
+# Cryptography and Security
 passlib
 cryptography
+# Environment
 python-dotenv
+# JWT
 python-jose

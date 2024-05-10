@@ -34,6 +34,7 @@ from utils.file_img import (
 from utils.generate import generate_random_code
 from dotenv import load_dotenv
 from database import session
+from chat.main import get_possible_job_titles,get_email_body
 
 
 # Load variables from the specified .env file
@@ -369,6 +370,93 @@ async def get_operation_user(access_token:str):
     except ValueError as ve:
         raise UserExistException(detail="User does not exist with the provided user id")
     return {"data":operations_info}
+
+
+
+
+@api_router.post("/chat/possible-job-titles")
+async def get_possible_job_titles_(resume: UploadFile = File(None)):
+    """
+    Send internship emails with attachments.
+    """
+    
+    if resume is None:
+        raise FileNotFoundException(detail="Resume PDF files are missing.")
+    
+    # Check if the resume file is a PDF file
+    if not resume.filename.lower().endswith('.pdf'):
+        raise FileExtensionException(detail="The resume file must be a PDF file.")
+
+    temp_dir = str(Path("./temp"))
+    resume_dir = str(Path("./temp/resume"))
+
+    # Check if resume directory exists within data directory, if not, create it
+    if not os.path.exists(resume_dir):
+        os.makedirs(resume_dir)
+    
+    # Check if temp_dir exists, if not, create it
+    if not os.path.exists(temp_dir):
+        os.makedirs(temp_dir)
+
+    pdf_id = str(uuid.uuid4())
+    resume_pdf = f"{resume_dir}/{pdf_id}.pdf"
+    
+    with open(resume_pdf, "wb") as resume_file:
+        shutil.copyfileobj(resume.file, resume_file)
+    
+    # Await the asynchronous function
+    possible_job_titles = get_possible_job_titles(resume_pdf)
+
+    os.remove(resume_pdf)
+    return {"possible_job_titles": possible_job_titles}
+
+    
+
+
+@api_router.post("/chat/generated-email-body")
+async def get_email_body_(resume: UploadFile = File(None),langauage:str=Form("English"),email_subject:str=Form(...)):
+    """
+    Send internship emails with attachments.
+    """
+    
+    if resume is None:
+        raise FileNotFoundException(detail="Resume PDF files are missing.")
+    
+    
+    # Check if the resume file is a PDF file
+    if not resume.filename.lower().endswith('.pdf'):
+        raise FileExtensionException(detail="The resume file must be a PDF file.")
+
+    temp_dir:str = str(Path("./temp"))
+    resume_dir:str = str(Path("./temp/resume"))
+
+
+    # Check if resume directory exists within data directory, if not, create it
+    if not os.path.exists(resume_dir):
+        os.makedirs(resume_dir)
+    
+    # Check if temp_dir exists, if not, create it
+    if not os.path.exists(temp_dir):
+        os.makedirs(temp_dir)
+
+    pdf_id:str = str(uuid.uuid4())
+    resume_pdf:str=f"{resume_dir}/{pdf_id}.pdf"
+    with open(resume_pdf, "wb") as resume_file:
+        shutil.copyfileobj(resume.file, resume_file)
+    
+    email_body= get_email_body(resume_pdf,email_subject,langauage)
+
+    
+    os.remove(resume_pdf)
+    return {"email_body": email_body}
+
+
+
+
+
+
+
+
 
 # Include the API router in the main app
 app.include_router(api_router)

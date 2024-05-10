@@ -167,6 +167,18 @@ function main {
         if ([string]::IsNullOrEmpty($user_name)) {
             $user_name = "root"
         }
+        Write-Host 
+        if ($db_type -eq "oracle" -or $db_type -eq "oracledb") {
+            $default_service_name = "ORCL"
+            $service_name = Read-Host "Enter the service name (default is $default_service_name): "
+            $default_tablespace_name = "USERS"
+            $tablespace_name = Read-Host "Enter the tablespace name (default is $default_tablespace_name): "
+            $default_data_file_size = "100M"
+            $data_file_size = Read-Host "Enter the data file size (default is $default_tablespace_name): "
+            Update-EnvVariable "env/database.env" "SERVICE_NAME" ($service_name -or $default_service_name) $true
+            Update-EnvVariable "env/database.env" "TABLESPACE_NAME" ($tablespace_name -or $default_tablespace_name) $true
+            Update-EnvVariable "env/database.env" "TABLESPACE_NAME" ($data_file_size -or $default_data_file_size) $true
+        }
         update_env_variable "env/database.env" "DB_NAME" $db_name 1
         update_env_variable "env/database.env" "HOST" $db_host 1
         update_env_variable "env/database.env" "DB_TYPE" $db_type 1
