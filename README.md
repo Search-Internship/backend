@@ -340,7 +340,8 @@ $ docker run -p you_port:5000 ema-back:tagname
   - **Response Body**:
     ```json
     {
-        "exist": true
+        "exist": true,
+        "access_token":"xswhdhdjsdhhdjcbdhh3hd4h43ud23u33odj8339"
     }
     ```
     - `exist` (boolean): Indicates whether the email exists (`true`) or not (`false`).
@@ -369,27 +370,7 @@ $ docker run -p you_port:5000 ema-back:tagname
     }
     ```
 
-### Forgot Password
 
-- **URL**: `PUT /api/users/forgot-password`
-- **Description**: Reset the password for a user who has forgotten it.
-- **Request Body**:
-  - `new_password` (string): The new password for the user.
-  - `email` (string): The email address of the user.
-- **Password Constraint**:
-  - Passwords must meet the following criteria:
-    - Contains at least one lowercase character
-    - Contains at least one uppercase character
-    - Contains at least one digit
-    - Has a minimum length of 8 characters
-- **Response**:
-  - **Status Code**: 200 OK
-  - **Response Body**:
-    ```json
-    {
-        "message": "Password changed successfully"
-    }
-    ```
 
 
 
