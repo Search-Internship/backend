@@ -424,7 +424,7 @@ async def get_possible_job_titles_(resume: UploadFile = File(None)):
 
 
 @api_router.post("/chat/generated-email-body")
-async def get_email_body_(resume: UploadFile = File(None),langauage:str=Form("English"),email_subject:str=Form(...)):
+async def get_email_body_(resume: UploadFile = File(None),language:str=Form("English"),email_subject:str=Form(...)):
     """
     Send internship emails with attachments.
     """
@@ -454,7 +454,7 @@ async def get_email_body_(resume: UploadFile = File(None),langauage:str=Form("En
     with open(resume_pdf, "wb") as resume_file:
         shutil.copyfileobj(resume.file, resume_file)
     
-    email_body= get_email_body(resume_pdf,email_subject,langauage)
+    email_body= get_email_body(resume_pdf,email_subject,language)
 
     
     os.remove(resume_pdf)

@@ -82,6 +82,7 @@ def extract_list_from_string(result:str)->list:
     return matches
 
 def get_email_body(resume_pdf_path:str,email_subject:str,language:str)->list:
+    print("language",language)
     """
     Generates an email body in markdown language from a resume PDF.
 
@@ -99,13 +100,14 @@ def get_email_body(resume_pdf_path:str,email_subject:str,language:str)->list:
     """
     page_contents=get_pages_contents_from_pdf(resume_pdf_path)
     llm = ChatGoogleGenerativeAI(model=MODEL_NAME,google_api_key=GEMINI_API_KEY,project=PROJECT_NAME)
-    result = llm.invoke(f"Generate an email body with this spe")
-
-    return remove_markdown(result.content)
+    result = llm.invoke(f"generer un email en HTML (utiliser les balises HTML) en se basant sur les informations de mon CV (compétences, projets, à propos...) : {page_contents}. Limitez le contenu à 5 lignes et n'incluez pas le sujet dans l'email (obliigatoire). Utilisez le nom de l'expéditeur qui est dans le CV.      La langue est {language}. (balises HTML autorisées)")
 
 
+    return remove_(result.content,"html")
 
-def remove_markdown(text):
+
+
+def remove_(text,item):
     """
     Removes markdown formatting from text.
 
@@ -116,9 +118,9 @@ def remove_markdown(text):
         str: The text with markdown formatting removed.
 
     Example:
-        >>> remove_markdown("**Hello** *world*")
+        >>> remove_markdown("*Hello* world")
         'Hello world'
     """
-    if text.startswith("```markdown\n") and text.endswith("```"):
-        return text[len("```markdown\n") : -len("```")]
+    if text.startswith(f"{item}\n") and text.endswith(""):
+        return text[len(f"{item}\n") : -len("")]
     return text
