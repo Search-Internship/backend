@@ -100,7 +100,7 @@ def get_email_body(resume_pdf_path:str,email_subject:str,language:str)->list:
     """
     page_contents=get_pages_contents_from_pdf(resume_pdf_path)
     llm = ChatGoogleGenerativeAI(model=MODEL_NAME,google_api_key=GEMINI_API_KEY,project=PROJECT_NAME)
-    result = llm.invoke(f"generer un email en HTML (utiliser les balises HTML) en se basant sur les informations de mon CV (compétences, projets, à propos...) : {page_contents}. Limitez le contenu à 5 lignes et n'incluez pas le sujet dans l'email (obliigatoire). Utilisez le nom de l'expéditeur qui est dans le CV.      La langue est {language}. (balises HTML autorisées)")
+    result = llm.invoke(f"generer un email en HTML (utiliser les balises HTML) en se basant sur les informations de mon CV (compétences, projets, à propos...) : {page_contents} et le sujet {email_subject}. Limitez le contenu à 5 lignes et n'incluez pas le sujet dans l'email (obliigatoire). Utilisez le nom de l'expéditeur qui est dans le CV.      La langue est {language}. (balises HTML autorisées)")
 
 
     return remove_(result.content,"html")
